@@ -388,7 +388,7 @@ const LANGS = {
       of: 'de',
     },
     chapters: [
-      { title: 'Quem sou eu',         questions: ['Qual é o seu nome completo? Onde você nasceu? Em que ano?', 'Como você descreveria sua origem — sua família, sua cidade, o ambiente em que cresceu?'] },
+      { title: 'Quem sou eu',         questions: ['Onde você nasceu e em que ano? Como era o lugar onde cresceu?', 'Como você descreveria sua origem — sua família, sua cidade, o ambiente em que cresceu?'] },
       { title: 'Infância e família',   questions: ['Conte sobre sua infância. Como era sua casa? Quem eram as pessoas mais próximas de você?', 'Qual memória da infância você mais carrega no coração? Por quê ela é especial?'] },
       { title: 'Escola e juventude',   questions: ['Como foram seus anos de escola? Havia algo que você adorava aprender ou fazer?', 'Quem foram os professores ou amigos que marcaram sua juventude?'] },
       { title: 'Trabalho e carreira',  questions: ['Como começou sua vida profissional? Qual foi seu primeiro trabalho?', 'Qual conquista profissional você considera mais significativa? O que ela representou para você?'] },
@@ -431,7 +431,7 @@ const LANGS = {
       of: 'of',
     },
     chapters: [
-      { title: 'Who I am',             questions: ['What is your full name? Where were you born? In what year?', 'How would you describe your origins — your family, your town, the environment you grew up in?'] },
+      { title: 'Who I am',             questions: ['Where were you born and in what year? What was the place like where you grew up?', 'How would you describe your origins — your family, your town, the environment you grew up in?'] },
       { title: 'Childhood & family',   questions: ['Tell me about your childhood. What was your home like? Who were the people closest to you?', 'What childhood memory do you carry most in your heart? Why is it special?'] },
       { title: 'School & youth',       questions: ['What were your school years like? Was there something you loved to learn or do?', 'Who were the teachers or friends who shaped your youth?'] },
       { title: 'Work & career',        questions: ['How did your professional life begin? What was your first job?', 'What professional achievement do you consider most significant? What did it mean to you?'] },
@@ -474,7 +474,7 @@ const LANGS = {
       of: 'von',
     },
     chapters: [
-      { title: 'Wer ich bin',           questions: ['Wie lautet Ihr vollständiger Name? Wo wurden Sie geboren? In welchem Jahr?', 'Wie würden Sie Ihre Herkunft beschreiben — Ihre Familie, Ihre Stadt, Ihr Umfeld?'] },
+      { title: 'Wer ich bin',           questions: ['Wo wurden Sie geboren und in welchem Jahr? Wie war der Ort, in dem Sie aufgewachsen sind?', 'Wie würden Sie Ihre Herkunft beschreiben — Ihre Familie, Ihre Stadt, Ihr Umfeld?'] },
       { title: 'Kindheit & Familie',    questions: ['Erzählen Sie von Ihrer Kindheit. Wie war Ihr Zuhause? Wer stand Ihnen am nächsten?', 'Welche Kindheitserinnerung tragen Sie am meisten im Herzen? Warum ist sie besonders?'] },
       { title: 'Schule & Jugend',       questions: ['Wie waren Ihre Schuljahre? Gab es etwas, das Sie besonders liebten zu lernen oder zu tun?', 'Wer waren die Lehrer oder Freunde, die Ihre Jugend prägten?'] },
       { title: 'Arbeit & Karriere',     questions: ['Wie begann Ihr Berufsleben? Was war Ihre erste Stelle?', 'Welche berufliche Leistung halten Sie für die bedeutendste? Was bedeutete sie Ihnen?'] },
@@ -517,7 +517,7 @@ const LANGS = {
       of: 'de',
     },
     chapters: [
-      { title: 'Quién soy',            questions: ['¿Cuál es tu nombre completo? ¿Dónde naciste? ¿En qué año?', '¿Cómo describirías tus orígenes — tu familia, tu ciudad, el ambiente en que creciste?'] },
+      { title: 'Quién soy',            questions: ['¿Dónde naciste y en qué año? ¿Cómo era el lugar donde creciste?', '¿Cómo describirías tus orígenes — tu familia, tu ciudad, el ambiente en que creciste?'] },
       { title: 'Infancia y familia',   questions: ['Cuéntame sobre tu infancia. ¿Cómo era tu hogar? ¿Quiénes eran las personas más cercanas a ti?', '¿Qué recuerdo de la infancia llevas más en el corazón? ¿Por qué es especial?'] },
       { title: 'Escuela y juventud',   questions: ['¿Cómo fueron tus años de escuela? ¿Había algo que amabas aprender o hacer?', '¿Quiénes fueron los profesores o amigos que marcaron tu juventud?'] },
       { title: 'Trabajo y carrera',    questions: ['¿Cómo empezó tu vida profesional? ¿Cuál fue tu primer trabajo?', '¿Qué logro profesional consideras más significativo? ¿Qué representó para ti?'] },
@@ -560,7 +560,7 @@ const LANGS = {
       of: 'sur',
     },
     chapters: [
-      { title: 'Qui je suis',          questions: ['Quel est votre nom complet ? Où êtes-vous né(e) ? En quelle année ?', 'Comment décririez-vous vos origines — votre famille, votre ville, votre environnement ?'] },
+      { title: 'Qui je suis',          questions: ['Où êtes-vous né(e) et en quelle année ? Comment était l'endroit où vous avez grandi ?', 'Comment décririez-vous vos origines — votre famille, votre ville, votre environnement ?'] },
       { title: 'Enfance & famille',    questions: ['Parlez-moi de votre enfance. À quoi ressemblait votre maison ? Qui étaient les personnes les plus proches de vous ?', 'Quel souvenir d\'enfance portez-vous le plus dans votre cœur ? Pourquoi est-il spécial ?'] },
       { title: 'École & jeunesse',     questions: ['Comment se sont passées vos années scolaires ? Y avait-il quelque chose que vous adoriez apprendre ou faire ?', 'Qui étaient les professeurs ou amis qui ont marqué votre jeunesse ?'] },
       { title: 'Travail & carrière',   questions: ['Comment a débuté votre vie professionnelle ? Quel a été votre premier emploi ?', 'Quelle réussite professionnelle considérez-vous la plus significative ? Que représentait-elle pour vous ?'] },
@@ -1197,7 +1197,18 @@ function renderQuestionScreen() {
   const chaps = chapters();
 
   const chap = chaps[state.chapterIdx];
-  const question = chap.questions[state.questionIdx];
+  let question = chap.questions[state.questionIdx];
+  // Personalize first question of chapter 1 with author name
+  if (state.chapterIdx === 0 && state.questionIdx === 0 && state.authorName) {
+    const greetMap = {
+      pt: `${state.authorName}, onde você nasceu e em que ano? Como era o lugar onde cresceu?`,
+      en: `${state.authorName}, where were you born and in what year? What was the place like where you grew up?`,
+      de: `${state.authorName}, wo wurden Sie geboren und in welchem Jahr? Wie war der Ort, in dem Sie aufgewachsen sind?`,
+      es: `${state.authorName}, ¿dónde naciste y en qué año? ¿Cómo era el lugar donde creciste?`,
+      fr: `${state.authorName}, où êtes-vous né(e) et en quelle année\u00A0? Comment était l\u2019endroit où vous avez grandi\u00A0?`,
+    };
+    question = greetMap[state.lang] || question;
+  }
 
   // reset transient state every time we land on a new question
   state.followupQuestion  = null;
