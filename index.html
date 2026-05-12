@@ -1195,19 +1195,17 @@ function renderSetupScreen() {
 function renderQuestionScreen() {
   const ui    = t();
   const chaps = chapters();
-  const totalQ = chaps.reduce((s, c) => s + c.questions.length, 0);
-  let currentQ = 0;
-  for (let i = 0; i < state.chapterIdx; i++) currentQ += chaps[i].questions.length;
-  currentQ += state.questionIdx;
 
   const chap = chaps[state.chapterIdx];
   const question = chap.questions[state.questionIdx];
 
-  // reset transient state
+  // reset transient state every time we land on a new question
   state.followupQuestion  = null;
   state.awaitingFollowup  = false;
   state.pendingAnswer     = '';
   state.pendingFollowup   = '';
+
+  const canGoBack = state.chapterIdx > 0 || state.questionIdx > 0;
 
   screen().innerHTML = `
     <div id="progress-wrap">
@@ -1230,6 +1228,10 @@ function renderQuestionScreen() {
       <div class="btn-row">
         <button class="btn btn-primary" id="next-btn">${ui.nextBtn}</button>
         <button class="btn btn-secondary" id="skip-btn">${ui.skipBtn}</button>
+        ${canGoBack ? `<button class="btn btn-secondary" id="back-btn" style="margin-left:auto;">← Voltar</button>` : ''}
+      </div>
+      <div style="margin-top:.75rem; text-align:right;">
+        <button class="btn btn-secondary" id="save-now-btn" style="font-size:.78rem; padding:.35rem .85rem; color:var(--ink-light);">💾 Salvar respostas</button>
       </div>
     </div>
   `;
@@ -1238,6 +1240,33 @@ function renderQuestionScreen() {
 
   $('next-btn').addEventListener('click', () => handleNextClick(question, chap.title));
   $('skip-btn').addEventListener('click', () => advanceQuestion(question, chap.title, '', null, ''));
+
+  if (canGoBack) {
+    $('back-btn').addEventListener('click', () => {
+      // Remove last saved answer if it matches current position
+      // Go back one question
+      if (state.questionIdx > 0) {
+        state.questionIdx--;
+      } else {
+        state.chapterIdx--;
+        state.questionIdx = chaps[state.chapterIdx].questions.length - 1;
+      }
+      // Remove the last pushed answer so it can be redone
+      if (state.answers.length > 0) state.answers.pop();
+      renderQuestionScreen();
+    });
+  }
+
+  $('save-now-btn').addEventListener('click', () => {
+    if (!state.answers.length) { showError('Nenhuma resposta ainda.'); return; }
+    const data = JSON.stringify({ lang: state.lang, authorName: state.authorName, answers: state.answers, savedAt: new Date().toISOString() }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  });
 }
 
 async function handleNextClick(question, chapterTitle) {
