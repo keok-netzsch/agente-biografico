@@ -334,6 +334,29 @@
     .final-hero p { color: var(--ink-mid); max-width: 480px; margin: 0 auto 1.5rem; }
 
     /* ── Responsive ─────────────────────────────────────── */
+    /* ── Photo upload ───────────────────────────────────── */
+    .photo-upload-area {
+      border: 2px dashed var(--parchment);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      margin-top: 1rem;
+      color: var(--ink-light);
+      font-size: .88rem;
+    }
+    .photo-upload-area:hover { border-color: var(--amber-light); background: var(--amber-pale); }
+    .photo-upload-area input[type=file] { display: none; }
+    .photo-thumbs {
+      display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; justify-content: center;
+    }
+    .photo-thumb {
+      width: 64px; height: 64px; object-fit: cover;
+      border-radius: 6px; border: 2px solid var(--parchment);
+      filter: sepia(80%);
+    }
+
     @media (max-width: 520px) {
       .card { padding: 1.4rem; }
       .btn-row { flex-direction: column; }
@@ -589,6 +612,8 @@ const state = {
   chapterIdx: 0,
   questionIdx: 0,
   answers: [],
+  photos: {},          // { chapterIdx: [base64png, ...] }
+  coverImageB64: null, // AI-generated cover (base64 png)
   pendingAnswer: '',
   pendingFollowup: '',
   followupQuestion: null,
@@ -784,6 +809,112 @@ Rédigez un texte narratif fluide pour un chapitre d'autobiographie basé sur le
 }
 
 // ═══════════════════════════════════════════════════════
+//  IMAGE PROCESSING
+// ═══════════════════════════════════════════════════════
+
+async function fileToSepiaBase64(file, maxPx = 1200) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        // Resize
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else       { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // Sepia filter
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const d = imageData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i+1], b = d[i+2];
+          d[i]   = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+          d[i+1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+          d[i+2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL('image/jpeg', 0.88));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function composeMosaic(b64list, targetW = 1200) {
+  if (b64list.length === 1) return b64list[0];
+  return new Promise((resolve) => {
+    const imgs = [];
+    let loaded = 0;
+    for (const src of b64list) {
+      const img = new Image();
+      img.onload = () => {
+        loaded++;
+        if (loaded === b64list.length) buildMosaic();
+      };
+      img.src = src;
+      imgs.push(img);
+    }
+    function buildMosaic() {
+      const n = imgs.length;
+      const cols = n <= 2 ? n : n <= 4 ? 2 : 3;
+      const rows = Math.ceil(n / cols);
+      const cellW = Math.floor(targetW / cols);
+      const cellH = cellW; // square cells
+      const canvas = document.createElement('canvas');
+      canvas.width  = cols * cellW;
+      canvas.height = rows * cellH;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#F9F5EF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      imgs.forEach((img, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = col * cellW + 2, y = row * cellH + 2;
+        const w = cellW - 4,       h = cellH - 4;
+        // Cover fit
+        const scale = Math.max(w / img.width, h / img.height);
+        const sw = img.width * scale, sh = img.height * scale;
+        const sx = (sw - w) / 2,     sy = (sh - h) / 2;
+        ctx.drawImage(img, -sx / scale, -sy / scale, img.width, img.height,
+                      x, y, w, h);
+      });
+      resolve(canvas.toDataURL('image/jpeg', 0.88));
+    }
+  });
+}
+
+async function fetchCoverImage(authorName, chap1Summary) {
+  const prompt = encodeURIComponent(
+    `vintage sepia memoir book cover, warm candlelight, handwritten pages, old photographs, soft bokeh, biographical portrait, person named ${authorName}, ${chap1Summary}, painterly, nostalgic`
+  );
+  const url = `https://image.pollinations.ai/prompt/${prompt}?width=800&height=1100&nologo=true&seed=${Date.now()}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch { return null; }
+}
+
+function base64ToBytes(b64) {
+  const raw = b64.includes(',') ? b64.split(',')[1] : b64;
+  const bin = atob(raw);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+// ═══════════════════════════════════════════════════════
 //  DOCX GENERATION (pure JS, no CDN dependency)
 // ═══════════════════════════════════════════════════════
 
@@ -925,7 +1056,7 @@ function makeParaXml(text, opts = {}) {
   return `<w:p>${pPr}<w:r>${rPr}<w:t xml:space="preserve">${xmlEsc(text)}</w:t></w:r></w:p>`;
 }
 
-async function generateDocx(narratives) {
+async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   const enc = new TextEncoder();
   const chapsList = chapters();
 
@@ -941,9 +1072,47 @@ async function generateDocx(narratives) {
 
   // ── Build document.xml ────────────────────────────────
   let body = '';
+  const imageFiles = []; // {name, data} pairs for zip
+  let imgCounter = 1;
+  const imgRels = []; // {rId, name}
+
+  function makeImageXml(rId, widthEmu, heightEmu) {
+    return `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="240" w:after="240"/></w:pPr>
+      <w:r><w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+        <wp:extent cx="${widthEmu}" cy="${heightEmu}"/>
+        <wp:docPr id="${rId}" name="img${rId}"/>
+        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+              <pic:nvPicPr><pic:cNvPr id="${rId}" name="img${rId}"/><pic:cNvPicPr/></pic:nvPicPr>
+              <pic:blipFill>
+                <a:blip r:embed="rId${rId + 10}"/>
+                <a:stretch><a:fillRect/></a:stretch>
+              </pic:blipFill>
+              <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${widthEmu}" cy="${heightEmu}"/></a:xfrm>
+                <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+              </pic:spPr>
+            </pic:pic>
+          </a:graphicData>
+        </a:graphic>
+      </wp:inline></w:drawing></w:r></w:p>`;
+  }
 
   // Title page
-  body += makeParaXml('', { spaceAfter: 0, spaceBefore: 2880 });
+  body += makeParaXml('', { spaceAfter: 0, spaceBefore: coverB64 ? 480 : 2880 });
+
+  // Cover image if available
+  if (coverB64) {
+    const coverBytes = base64ToBytes(coverB64);
+    const coverName  = `image${imgCounter}.jpeg`;
+    imageFiles.push({ name: `word/media/${coverName}`, data: coverBytes });
+    const rId = imgCounter; imgCounter++;
+    imgRels.push({ rId: rId + 10, name: coverName });
+    // ~12cm wide, proportional height (800x1100 ratio)
+    body += makeImageXml(rId, 4320000, 5940000);
+    body += makeParaXml('', { spaceAfter: 240, spaceBefore: 0 });
+  }
+
   body += makeParaXml(bookTitle,                        { bold:true, size:52, center:true, spaceAfter:360, spaceBefore:0 });
   body += makeParaXml(`${byWord} ${state.authorName}`,  { italic:true, size:28, color:'5C4F3A', center:true, spaceAfter:240, spaceBefore:0 });
   body += makeParaXml(dateStr,                          { size:22, color:'9A8B73', center:true, spaceAfter:0, spaceBefore:0 });
@@ -962,6 +1131,18 @@ async function generateDocx(narratives) {
     const paras = narrative.split(/\n+/).filter(p => p.trim());
     for (const para of paras) {
       body += makeParaXml(para, { firstIndent: 720, spaceAfter: 200 });
+    }
+
+    // Chapter photos (mosaic already composed + sepia applied)
+    if (chapterImages[i] && chapterImages[i].length > 0) {
+      const mosaicB64  = await composeMosaic(chapterImages[i]);
+      const imgBytes   = base64ToBytes(mosaicB64);
+      const imgName    = `image${imgCounter}.jpeg`;
+      imageFiles.push({ name: `word/media/${imgName}`, data: imgBytes });
+      const rId = imgCounter; imgCounter++;
+      imgRels.push({ rId: rId + 10, name: imgName });
+      body += makeParaXml('', { spaceAfter: 120, spaceBefore: 240 });
+      body += makeImageXml(rId, 5760000, 5760000); // ~16cm square
     }
 
     if (i < narratives.length - 1) {
@@ -1037,33 +1218,51 @@ async function generateDocx(narratives) {
 </w:styles>`;
 
   // ── Relationships ─────────────────────────────────────
-  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>`;
+  // relsXml built dynamically below with image relationships
 
   const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>`;
 
-  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  // contentTypes built dynamically below with image overrides
+
+  // Build image relationships
+  let imgRelEntries = imgRels.map(r =>
+    `<Relationship Id="rId${r.rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${r.name}"/>`
+  ).join('\n  ');
+
+  // Build content type overrides for images
+  let imgContentTypes = imageFiles.map(f =>
+    `<Override PartName="/${f.name}" ContentType="image/jpeg"/>`
+  ).join('\n  ');
+
+  const contentTypesXmlFinal = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml"  ContentType="application/xml"/>
+  <Default Extension="jpeg" ContentType="image/jpeg"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml"   ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
   <Override PartName="/word/footer1.xml"  ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+  ${imgContentTypes}
 </Types>`;
 
+  const relsXmlFinal = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  ${imgRelEntries}
+</Relationships>`;
+
   const files = [
-    { name: '[Content_Types].xml',       data: enc.encode(contentTypesXml) },
-    { name: '_rels/.rels',               data: enc.encode(rootRelsXml) },
-    { name: 'word/document.xml',         data: enc.encode(documentXml) },
-    { name: 'word/styles.xml',           data: enc.encode(stylesXml) },
-    { name: 'word/footer1.xml',          data: enc.encode(footerXml) },
-    { name: 'word/_rels/document.xml.rels', data: enc.encode(relsXml) },
+    { name: '[Content_Types].xml',          data: enc.encode(contentTypesXmlFinal) },
+    { name: '_rels/.rels',                  data: enc.encode(rootRelsXml) },
+    { name: 'word/document.xml',            data: enc.encode(documentXml) },
+    { name: 'word/styles.xml',              data: enc.encode(stylesXml) },
+    { name: 'word/footer1.xml',             data: enc.encode(footerXml) },
+    { name: 'word/_rels/document.xml.rels', data: enc.encode(relsXmlFinal) },
+    ...imageFiles,
   ];
 
   const zipData = await buildZip(files);
@@ -1236,6 +1435,15 @@ function renderQuestionScreen() {
       <label class="followup-label" id="answer-label" style="margin-bottom:.5rem;">${ui.yourAnswerLabel}</label>
       <textarea id="answer-box" placeholder="..." rows="5"></textarea>
 
+      <div class="photo-upload-area" id="photo-drop">
+        <label for="photo-input" style="cursor:pointer;">
+          📷 <strong>Adicionar fotos a este capítulo</strong> (opcional)<br>
+          <span style="font-size:.8rem;">Clique ou arraste imagens aqui — serão aplicadas em sépia no livro</span>
+        </label>
+        <input type="file" id="photo-input" accept="image/*" multiple />
+        <div class="photo-thumbs" id="photo-thumbs"></div>
+      </div>
+
       <div class="btn-row">
         <button class="btn btn-primary" id="next-btn">${ui.nextBtn}</button>
         <button class="btn btn-secondary" id="skip-btn">${ui.skipBtn}</button>
@@ -1277,6 +1485,45 @@ function renderQuestionScreen() {
     a.href = url; a.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
     document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  });
+
+  // ── Photo upload wiring ──────────────────────────────
+  const chapIdx = state.chapterIdx;
+  const thumbs  = $('photo-thumbs');
+
+  // Restore existing thumbs if user navigated back
+  if (state.photos[chapIdx]) {
+    for (const b64 of state.photos[chapIdx]) {
+      const img = document.createElement('img');
+      img.className = 'photo-thumb'; img.src = b64; thumbs.appendChild(img);
+    }
+  }
+
+  $('photo-input').addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+      const b64 = await fileToSepiaBase64(file, 1200);
+      if (!state.photos[chapIdx]) state.photos[chapIdx] = [];
+      state.photos[chapIdx].push(b64);
+      const img = document.createElement('img');
+      img.className = 'photo-thumb'; img.src = b64; thumbs.appendChild(img);
+    }
+    e.target.value = '';
+  });
+
+  // Drag-and-drop
+  $('photo-drop').addEventListener('dragover', e => { e.preventDefault(); $('photo-drop').style.borderColor = 'var(--amber)'; });
+  $('photo-drop').addEventListener('dragleave', () => { $('photo-drop').style.borderColor = ''; });
+  $('photo-drop').addEventListener('drop', async (e) => {
+    e.preventDefault(); $('photo-drop').style.borderColor = '';
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    for (const file of files) {
+      const b64 = await fileToSepiaBase64(file, 1200);
+      if (!state.photos[chapIdx]) state.photos[chapIdx] = [];
+      state.photos[chapIdx].push(b64);
+      const img = document.createElement('img');
+      img.className = 'photo-thumb'; img.src = b64; thumbs.appendChild(img);
+    }
   });
 }
 
@@ -1426,9 +1673,15 @@ async function runGeneration(byChapter, chaps) {
     }
   }
 
+  // Generate AI cover image
+  status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">🎨 Gerando capa…</p>`;
+  const chap1Summary = (byChapter[0] || []).map(a => a.answer).filter(Boolean).join(' ').slice(0, 120);
+  const coverB64 = await fetchCoverImage(state.authorName, chap1Summary);
+  state.coverImageB64 = coverB64;
+
   status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">📄 DOCX…</p>`;
   try {
-    const blob = await generateDocx(narratives);
+    const blob = await generateDocx(narratives, state.photos, coverB64);
     state.docxBlob = blob;
     renderFinalScreen();
   } catch (e) {
