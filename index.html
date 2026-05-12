@@ -1625,29 +1625,96 @@ function renderGenerateScreen() {
       <div class="chapter-title">${ui.chaptersProgress}</div>
       <ul class="chapter-list">${chapterItems}</ul>
       <div class="btn-row" style="margin-top:1.75rem;">
-        <button class="btn btn-primary" id="generate-btn">${ui.finishBtn}</button>
         <button class="btn btn-secondary" id="backup-btn">⬇ Salvar respostas (JSON)</button>
+      </div>
+    </div>
+
+    <div class="card" id="cover-card">
+      <div class="chapter-title">Capa do livro</div>
+
+      <div id="cover-preview-wrap" style="text-align:center; margin-bottom:1rem;">
+        <div id="cover-placeholder" style="
+          width:180px; height:248px; margin:0 auto;
+          background:var(--parchment); border-radius:var(--radius);
+          display:flex; align-items:center; justify-content:center;
+          color:var(--ink-light); font-size:.85rem; border:1.5px dashed var(--amber-light);
+        ">Nenhuma capa ainda</div>
+        <img id="cover-preview" src="" alt="Capa" style="
+          display:none; width:180px; border-radius:var(--radius);
+          box-shadow:var(--shadow); filter:sepia(30%);
+        "/>
+      </div>
+
+      <div class="btn-row" style="justify-content:center; flex-wrap:wrap;">
+        <button class="btn btn-primary" id="gen-cover-btn">🎨 Gerar capa com IA</button>
+        <button class="btn btn-secondary" id="regen-cover-btn" style="display:none;">🔄 Regenerar</button>
+        <label class="btn btn-secondary" for="cover-upload-input" style="cursor:pointer;">📁 Usar minha foto</label>
+        <input type="file" id="cover-upload-input" accept="image/*" style="display:none;"/>
+      </div>
+      <p id="cover-status" style="text-align:center; font-size:.82rem; color:var(--ink-light); margin-top:.75rem;"></p>
+
+      <div class="btn-row" style="margin-top:1.5rem;">
+        <button class="btn btn-primary" id="generate-btn">${ui.finishBtn}</button>
       </div>
       <div id="gen-status"></div>
     </div>
   `;
 
-  $('generate-btn').addEventListener('click', () => runGeneration(byChapter, chaps));
-
+  // ── Backup ───────────────────────────────────────────
   $('backup-btn').addEventListener('click', () => {
-    const data = JSON.stringify({
-      lang: state.lang,
-      authorName: state.authorName,
-      answers: state.answers,
-      savedAt: new Date().toISOString(),
-    }, null, 2);
+    const data = JSON.stringify({ lang: state.lang, authorName: state.authorName, answers: state.answers, savedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url2 = URL.createObjectURL(blob);
-      const a2 = document.createElement('a');
-      a2.href = url2; a2.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
-      document.body.appendChild(a2); a2.click();
-      setTimeout(() => { URL.revokeObjectURL(url2); a2.remove(); }, 1000);
+    const a2 = document.createElement('a');
+    a2.href = url2; a2.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
+    document.body.appendChild(a2); a2.click();
+    setTimeout(() => { URL.revokeObjectURL(url2); a2.remove(); }, 1000);
   });
+
+  // ── Cover preview helper ─────────────────────────────
+  function showCoverPreview(b64) {
+    state.coverImageB64 = b64;
+    $('cover-placeholder').style.display = 'none';
+    const img = $('cover-preview');
+    img.src = b64; img.style.display = 'block';
+    $('regen-cover-btn').style.display = 'inline-flex';
+    $('cover-status').textContent = '';
+  }
+
+  // ── Generate AI cover ─────────────────────────────────
+  async function doGenCover() {
+    $('gen-cover-btn').disabled = true;
+    $('regen-cover-btn').disabled = true;
+    $('cover-status').innerHTML = '<span class="spinner" style="border-top-color:var(--amber);border-color:rgba(201,123,42,.2);vertical-align:middle;"></span> Gerando capa…';
+    const chap1Summary = (byChapter[0] || []).map(a => a.answer).filter(Boolean).join(' ').slice(0, 120);
+    const b64 = await fetchCoverImage(state.authorName, chap1Summary);
+    $('gen-cover-btn').disabled = false;
+    $('regen-cover-btn').disabled = false;
+    if (b64) {
+      showCoverPreview(b64);
+    } else {
+      $('cover-status').textContent = 'Não foi possível gerar a capa. Tente novamente ou use sua própria foto.';
+    }
+  }
+
+  $('gen-cover-btn').addEventListener('click', doGenCover);
+  $('regen-cover-btn').addEventListener('click', doGenCover);
+
+  // ── Upload own cover photo ────────────────────────────
+  $('cover-upload-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    $('cover-status').textContent = 'Processando…';
+    const b64 = await fileToSepiaBase64(file, 800);
+    showCoverPreview(b64);
+    e.target.value = '';
+  });
+
+  // Restore previously generated cover if navigating back
+  if (state.coverImageB64) showCoverPreview(state.coverImageB64);
+
+  // ── Generate book ─────────────────────────────────────
+  $('generate-btn').addEventListener('click', () => runGeneration(byChapter, chaps));
 }
 
 async function runGeneration(byChapter, chaps) {
@@ -1673,15 +1740,9 @@ async function runGeneration(byChapter, chaps) {
     }
   }
 
-  // Generate AI cover image
-  status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">🎨 Gerando capa…</p>`;
-  const chap1Summary = (byChapter[0] || []).map(a => a.answer).filter(Boolean).join(' ').slice(0, 120);
-  const coverB64 = await fetchCoverImage(state.authorName, chap1Summary);
-  state.coverImageB64 = coverB64;
-
   status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">📄 DOCX…</p>`;
   try {
-    const blob = await generateDocx(narratives, state.photos, coverB64);
+    const blob = await generateDocx(narratives, state.photos, state.coverImageB64);
     state.docxBlob = blob;
     renderFinalScreen();
   } catch (e) {
