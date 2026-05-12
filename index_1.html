@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agente Biográfico</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Design tokens ─────────────────────────────────── */
+    :root {
+      --cream:       #F9F5EF;
+      --parchment:   #EFE8DA;
+      --ink:         #2B2416;
+      --ink-mid:     #5C4F3A;
+      --ink-light:   #9A8B73;
+      --amber:       #C97B2A;
+      --amber-light: #E8A84E;
+      --amber-pale:  #FBF0DE;
+      --red-warn:    #B03A2E;
+      --radius:      10px;
+      --shadow:      0 4px 24px rgba(43,36,22,.10);
+      --transition:  .25s ease;
+    }
+
+    /* ── Reset / base ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    #app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    header {
+      text-align: center;
+      padding: 3rem 0 2rem;
+      border-bottom: 2px solid var(--parchment);
+      margin-bottom: 2.5rem;
+    }
+    header .ornament {
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--amber);
+      letter-spacing: .2em;
+      margin-bottom: .75rem;
+      display: block;
+    }
+    header h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--ink);
+    }
+    header p.subtitle {
+      color: var(--ink-mid);
+      font-size: .95rem;
+      margin-top: .4rem;
+      font-weight: 300;
+    }
+
+    /* ── Cards ──────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--parchment);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      animation: fadeUp .4s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Progress bar ───────────────────────────────────── */
+    #progress-wrap {
+      margin-bottom: 1.75rem;
+    }
+    #progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--ink-light);
+      margin-bottom: .45rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    #progress-bar {
+      height: 5px;
+      background: var(--parchment);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--amber), var(--amber-light));
+      border-radius: 99px;
+      transition: width .5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+
+    /* ── Chapter title ──────────────────────────────────── */
+    .chapter-title {
+      font-family: 'Lora', serif;
+      font-size: 1.25rem;
+      color: var(--amber);
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: .25rem;
+    }
+    .question-text {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.45;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Textarea ───────────────────────────────────────── */
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      border: 1.5px solid var(--parchment);
+      border-radius: var(--radius);
+      padding: .85rem 1rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--cream);
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      line-height: 1.6;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(201,123,42,.12);
+      background: #fff;
+    }
+    textarea::placeholder { color: var(--ink-light); }
+
+    /* ── Buttons ────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 1.6rem;
+      border-radius: var(--radius);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      letter-spacing: .01em;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--amber);
+      color: #fff;
+    }
+    .btn-primary:not(:disabled):hover {
+      background: var(--amber-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(201,123,42,.3);
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid var(--parchment);
+      color: var(--ink-mid);
+    }
+    .btn-secondary:not(:disabled):hover {
+      background: var(--parchment);
+    }
+    .btn-row {
+      display: flex;
+      gap: .75rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── Inputs ─────────────────────────────────────────── */
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: .7rem 1rem;
+      border: 1.5px solid var(--parchment);
+      border-radius: var(--radius);
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 1rem;
+      color: var(--ink);
+      background: var(--cream);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    input[type="text"]:focus, input[type="password"]:focus, select:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(201,123,42,.12);
+      background: #fff;
+    }
+    select { appearance: none; cursor: pointer; }
+    label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--ink-mid);
+      margin-bottom: .4rem;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+    }
+    .field { margin-bottom: 1.25rem; }
+
+    /* ── Language selector ──────────────────────────────── */
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: .65rem;
+      margin-bottom: 1.5rem;
+    }
+    .lang-btn {
+      padding: .65rem .5rem;
+      border: 1.5px solid var(--parchment);
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: .9rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--transition);
+      color: var(--ink-mid);
+      font-family: 'Source Sans 3', sans-serif;
+    }
+    .lang-btn:hover { border-color: var(--amber-light); background: var(--amber-pale); }
+    .lang-btn.selected {
+      border-color: var(--amber);
+      background: var(--amber-pale);
+      color: var(--amber);
+      font-weight: 600;
+    }
+    .lang-flag { font-size: 1.3rem; display: block; margin-bottom: .2rem; }
+
+    /* ── AI response box ────────────────────────────────── */
+    .ai-response {
+      background: var(--amber-pale);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-size: .97rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      font-style: italic;
+    }
+    .ai-response strong { font-style: normal; color: var(--amber); }
+
+    /* ── Follow-up section ──────────────────────────────── */
+    .followup-label {
+      font-size: .82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--ink-light);
+      margin-bottom: .5rem;
+    }
+
+    /* ── Loading spinner ────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Error / notice ─────────────────────────────────── */
+    .notice {
+      padding: .75rem 1rem;
+      border-radius: var(--radius);
+      font-size: .9rem;
+      margin-bottom: 1rem;
+    }
+    .notice.error { background: #fdf3f2; border: 1px solid #e8b4b1; color: var(--red-warn); }
+    .notice.info  { background: var(--amber-pale); border: 1px solid var(--amber-light); color: var(--ink-mid); }
+
+    /* ── Chapter summary list ───────────────────────────── */
+    .chapter-list { list-style: none; }
+    .chapter-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: .75rem;
+      padding: .65rem 0;
+      border-bottom: 1px solid var(--parchment);
+      font-size: .93rem;
+      color: var(--ink-mid);
+    }
+    .chapter-list li:last-child { border: none; }
+    .chap-num {
+      font-family: 'Lora', serif;
+      font-weight: 600;
+      color: var(--amber);
+      min-width: 1.4rem;
+    }
+    .chap-done { color: #4a7c59; font-weight: 600; font-size: .8rem; }
+
+    /* ── Final screen ───────────────────────────────────── */
+    .final-hero {
+      text-align: center;
+      padding: 1.5rem 0;
+    }
+    .final-hero .big-icon { font-size: 3.5rem; }
+    .final-hero h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      margin: .75rem 0 .5rem;
+    }
+    .final-hero p { color: var(--ink-mid); max-width: 480px; margin: 0 auto 1.5rem; }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .card { padding: 1.4rem; }
+      .btn-row { flex-direction: column; }
+      .btn { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="ornament">✦ ✦ ✦</span>
+    <h1 id="main-title">Agente Biográfico</h1>
+    <p class="subtitle" id="main-subtitle">Conte a sua história. Preserve para sempre.</p>
+  </header>
+  <div id="screen"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  TRANSLATIONS
+// ═══════════════════════════════════════════════════════
+const LANGS = {
+  pt: {
+    flag: '🇧🇷', label: 'Português',
+    ui: {
+      appTitle: 'Agente Biográfico',
+      appSubtitle: 'Conte a sua história. Preserve para sempre.',
+      step0Title: 'Bem-vindo',
+      step0Intro: 'Este agente vai guiá-lo por perguntas sobre sua vida e gerar um livro autobiográfico em formato Word (DOCX) ao final.',
+      apiKeyLabel: 'Chave de API Claude',
+      apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'A chave é usada diretamente no navegador e nunca é armazenada.',
+      authorNameLabel: 'Seu nome completo',
+      authorNamePlaceholder: 'Como você quer ser identificado no livro',
+      startBtn: 'Começar minha história →',
+      nextBtn: 'Continuar →',
+      skipBtn: 'Pular esta pergunta',
+      finishBtn: 'Gerar meu livro',
+      downloadBtn: '⬇ Baixar DOCX',
+      restartBtn: 'Nova história',
+      generating: 'Gerando...',
+      thinking: 'Pensando...',
+      followupLabel: 'CLAUDE PERGUNTA',
+      yourAnswerLabel: 'SUA RESPOSTA',
+      chaptersProgress: 'Capítulos concluídos',
+      finalTitle: 'Seu livro está pronto!',
+      finalMessage: 'Sua história foi preservada. O arquivo DOCX está pronto para download — você pode editá-lo, imprimir ou compartilhar com sua família.',
+      errorApiKey: 'Por favor, insira sua chave de API Claude.',
+      errorName: 'Por favor, insira seu nome.',
+      errorApi: 'Erro na API: ',
+      progressLabel: 'Capítulo',
+      of: 'de',
+    },
+    chapters: [
+      { title: 'Quem sou eu',         questions: ['Qual é o seu nome completo? Onde você nasceu? Em que ano?', 'Como você descreveria sua origem — sua família, sua cidade, o ambiente em que cresceu?'] },
+      { title: 'Infância e família',   questions: ['Conte sobre sua infância. Como era sua casa? Quem eram as pessoas mais próximas de você?', 'Qual memória da infância você mais carrega no coração? Por quê ela é especial?'] },
+      { title: 'Escola e juventude',   questions: ['Como foram seus anos de escola? Havia algo que você adorava aprender ou fazer?', 'Quem foram os professores ou amigos que marcaram sua juventude?'] },
+      { title: 'Trabalho e carreira',  questions: ['Como começou sua vida profissional? Qual foi seu primeiro trabalho?', 'Qual conquista profissional você considera mais significativa? O que ela representou para você?'] },
+      { title: 'Amor e relacionamentos', questions: ['Conte sobre as pessoas que você amou — família, parceiro(a), amigos próximos.', 'Qual relacionamento moldou quem você é hoje? De que forma?'] },
+      { title: 'Momentos que me formaram', questions: ['Houve um momento — uma perda, uma virada, uma surpresa — que mudou o rumo da sua vida?', 'Se pudesse voltar e mudar algo, o que seria? E por quê não mudaria?'] },
+      { title: 'O que aprendi com a vida', questions: ['O que a vida lhe ensinou que nenhuma escola poderia ensinar?', 'Qual é sua maior crença sobre como se deve viver?'] },
+      { title: 'Mensagem para as próximas gerações', questions: ['O que você diria para seus filhos, netos ou qualquer pessoa jovem que ler este livro?', 'Como você gostaria de ser lembrado?'] },
+    ],
+  },
+
+  en: {
+    flag: '🇺🇸', label: 'English',
+    ui: {
+      appTitle: 'Biographical Agent',
+      appSubtitle: 'Tell your story. Preserve it forever.',
+      step0Title: 'Welcome',
+      step0Intro: 'This agent will guide you through questions about your life and generate an autobiographical book in Word (DOCX) format at the end.',
+      apiKeyLabel: 'Claude API Key',
+      apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Your key is used directly in the browser and is never stored.',
+      authorNameLabel: 'Your full name',
+      authorNamePlaceholder: 'As you want to appear in the book',
+      startBtn: 'Begin my story →',
+      nextBtn: 'Continue →',
+      skipBtn: 'Skip this question',
+      finishBtn: 'Generate my book',
+      downloadBtn: '⬇ Download DOCX',
+      restartBtn: 'New story',
+      generating: 'Generating...',
+      thinking: 'Thinking...',
+      followupLabel: 'CLAUDE ASKS',
+      yourAnswerLabel: 'YOUR ANSWER',
+      chaptersProgress: 'Chapters completed',
+      finalTitle: 'Your book is ready!',
+      finalMessage: 'Your story has been preserved. The DOCX file is ready to download — you can edit it, print it, or share it with your family.',
+      errorApiKey: 'Please enter your Claude API key.',
+      errorName: 'Please enter your name.',
+      errorApi: 'API error: ',
+      progressLabel: 'Chapter',
+      of: 'of',
+    },
+    chapters: [
+      { title: 'Who I am',             questions: ['What is your full name? Where were you born? In what year?', 'How would you describe your origins — your family, your town, the environment you grew up in?'] },
+      { title: 'Childhood & family',   questions: ['Tell me about your childhood. What was your home like? Who were the people closest to you?', 'What childhood memory do you carry most in your heart? Why is it special?'] },
+      { title: 'School & youth',       questions: ['What were your school years like? Was there something you loved to learn or do?', 'Who were the teachers or friends who shaped your youth?'] },
+      { title: 'Work & career',        questions: ['How did your professional life begin? What was your first job?', 'What professional achievement do you consider most significant? What did it mean to you?'] },
+      { title: 'Love & relationships', questions: ['Tell me about the people you have loved — family, partner, close friends.', 'Which relationship shaped who you are today? In what way?'] },
+      { title: 'Moments that shaped me', questions: ['Was there a moment — a loss, a turning point, a surprise — that changed the course of your life?', 'If you could go back and change something, what would it be? And why wouldn\'t you change it?'] },
+      { title: 'What life taught me',  questions: ['What has life taught you that no school ever could?', 'What is your deepest belief about how one should live?'] },
+      { title: 'Message to future generations', questions: ['What would you say to your children, grandchildren, or any young person who reads this book?', 'How would you like to be remembered?'] },
+    ],
+  },
+
+  de: {
+    flag: '🇩🇪', label: 'Deutsch',
+    ui: {
+      appTitle: 'Biographischer Agent',
+      appSubtitle: 'Erzählen Sie Ihre Geschichte. Bewahren Sie sie für immer.',
+      step0Title: 'Willkommen',
+      step0Intro: 'Dieser Agent führt Sie durch Fragen über Ihr Leben und erstellt am Ende ein autobiografisches Buch im Word-Format (DOCX).',
+      apiKeyLabel: 'Claude API-Schlüssel',
+      apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Ihr Schlüssel wird direkt im Browser verwendet und nie gespeichert.',
+      authorNameLabel: 'Ihr vollständiger Name',
+      authorNamePlaceholder: 'Wie Sie im Buch erscheinen möchten',
+      startBtn: 'Meine Geschichte beginnen →',
+      nextBtn: 'Weiter →',
+      skipBtn: 'Diese Frage überspringen',
+      finishBtn: 'Mein Buch erstellen',
+      downloadBtn: '⬇ DOCX herunterladen',
+      restartBtn: 'Neue Geschichte',
+      generating: 'Wird erstellt...',
+      thinking: 'Überlegt...',
+      followupLabel: 'CLAUDE FRAGT',
+      yourAnswerLabel: 'IHRE ANTWORT',
+      chaptersProgress: 'Abgeschlossene Kapitel',
+      finalTitle: 'Ihr Buch ist fertig!',
+      finalMessage: 'Ihre Geschichte wurde bewahrt. Die DOCX-Datei ist zum Download bereit — Sie können sie bearbeiten, drucken oder mit Ihrer Familie teilen.',
+      errorApiKey: 'Bitte geben Sie Ihren Claude API-Schlüssel ein.',
+      errorName: 'Bitte geben Sie Ihren Namen ein.',
+      errorApi: 'API-Fehler: ',
+      progressLabel: 'Kapitel',
+      of: 'von',
+    },
+    chapters: [
+      { title: 'Wer ich bin',           questions: ['Wie lautet Ihr vollständiger Name? Wo wurden Sie geboren? In welchem Jahr?', 'Wie würden Sie Ihre Herkunft beschreiben — Ihre Familie, Ihre Stadt, Ihr Umfeld?'] },
+      { title: 'Kindheit & Familie',    questions: ['Erzählen Sie von Ihrer Kindheit. Wie war Ihr Zuhause? Wer stand Ihnen am nächsten?', 'Welche Kindheitserinnerung tragen Sie am meisten im Herzen? Warum ist sie besonders?'] },
+      { title: 'Schule & Jugend',       questions: ['Wie waren Ihre Schuljahre? Gab es etwas, das Sie besonders liebten zu lernen oder zu tun?', 'Wer waren die Lehrer oder Freunde, die Ihre Jugend prägten?'] },
+      { title: 'Arbeit & Karriere',     questions: ['Wie begann Ihr Berufsleben? Was war Ihre erste Stelle?', 'Welche berufliche Leistung halten Sie für die bedeutendste? Was bedeutete sie Ihnen?'] },
+      { title: 'Liebe & Beziehungen',   questions: ['Erzählen Sie von den Menschen, die Sie geliebt haben — Familie, Partner, enge Freunde.', 'Welche Beziehung hat Ihren heutigen Charakter geformt? Auf welche Weise?'] },
+      { title: 'Prägende Momente',      questions: ['Gab es einen Moment — einen Verlust, eine Wende, eine Überraschung — der den Lauf Ihres Lebens verändert hat?', 'Wenn Sie etwas hätten ändern können, was wäre das? Und warum doch nicht?'] },
+      { title: 'Was das Leben mich lehrte', questions: ['Was hat das Leben Sie gelehrt, das keine Schule hätte lehren können?', 'Was ist Ihre tiefste Überzeugung darüber, wie man leben sollte?'] },
+      { title: 'Botschaft an künftige Generationen', questions: ['Was würden Sie Ihren Kindern, Enkeln oder einem jungen Menschen sagen, der dieses Buch liest?', 'Wie möchten Sie in Erinnerung bleiben?'] },
+    ],
+  },
+
+  es: {
+    flag: '🇪🇸', label: 'Español',
+    ui: {
+      appTitle: 'Agente Biográfico',
+      appSubtitle: 'Cuenta tu historia. Consérvala para siempre.',
+      step0Title: 'Bienvenido',
+      step0Intro: 'Este agente te guiará a través de preguntas sobre tu vida y generará un libro autobiográfico en formato Word (DOCX) al final.',
+      apiKeyLabel: 'Clave de API de Claude',
+      apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Tu clave se usa directamente en el navegador y nunca se almacena.',
+      authorNameLabel: 'Tu nombre completo',
+      authorNamePlaceholder: 'Como quieres aparecer en el libro',
+      startBtn: 'Comenzar mi historia →',
+      nextBtn: 'Continuar →',
+      skipBtn: 'Omitir esta pregunta',
+      finishBtn: 'Generar mi libro',
+      downloadBtn: '⬇ Descargar DOCX',
+      restartBtn: 'Nueva historia',
+      generating: 'Generando...',
+      thinking: 'Pensando...',
+      followupLabel: 'CLAUDE PREGUNTA',
+      yourAnswerLabel: 'TU RESPUESTA',
+      chaptersProgress: 'Capítulos completados',
+      finalTitle: '¡Tu libro está listo!',
+      finalMessage: 'Tu historia ha sido preservada. El archivo DOCX está listo para descargar — puedes editarlo, imprimirlo o compartirlo con tu familia.',
+      errorApiKey: 'Por favor, ingresa tu clave de API de Claude.',
+      errorName: 'Por favor, ingresa tu nombre.',
+      errorApi: 'Error de API: ',
+      progressLabel: 'Capítulo',
+      of: 'de',
+    },
+    chapters: [
+      { title: 'Quién soy',            questions: ['¿Cuál es tu nombre completo? ¿Dónde naciste? ¿En qué año?', '¿Cómo describirías tus orígenes — tu familia, tu ciudad, el ambiente en que creciste?'] },
+      { title: 'Infancia y familia',   questions: ['Cuéntame sobre tu infancia. ¿Cómo era tu hogar? ¿Quiénes eran las personas más cercanas a ti?', '¿Qué recuerdo de la infancia llevas más en el corazón? ¿Por qué es especial?'] },
+      { title: 'Escuela y juventud',   questions: ['¿Cómo fueron tus años de escuela? ¿Había algo que amabas aprender o hacer?', '¿Quiénes fueron los profesores o amigos que marcaron tu juventud?'] },
+      { title: 'Trabajo y carrera',    questions: ['¿Cómo empezó tu vida profesional? ¿Cuál fue tu primer trabajo?', '¿Qué logro profesional consideras más significativo? ¿Qué representó para ti?'] },
+      { title: 'Amor y relaciones',    questions: ['Cuéntame sobre las personas que has amado — familia, pareja, amigos cercanos.', '¿Qué relación moldeó quien eres hoy? ¿De qué manera?'] },
+      { title: 'Momentos que me formaron', questions: ['¿Hubo un momento — una pérdida, un giro, una sorpresa — que cambió el rumbo de tu vida?', 'Si pudieras volver y cambiar algo, ¿qué sería? ¿Y por qué no lo cambiarías?'] },
+      { title: 'Lo que la vida me enseñó', questions: ['¿Qué te ha enseñado la vida que ninguna escuela podría enseñarte?', '¿Cuál es tu creencia más profunda sobre cómo se debe vivir?'] },
+      { title: 'Mensaje a las próximas generaciones', questions: ['¿Qué le dirías a tus hijos, nietos o cualquier persona joven que lea este libro?', '¿Cómo te gustaría ser recordado?'] },
+    ],
+  },
+
+  fr: {
+    flag: '🇫🇷', label: 'Français',
+    ui: {
+      appTitle: 'Agent Biographique',
+      appSubtitle: 'Racontez votre histoire. Préservez-la pour toujours.',
+      step0Title: 'Bienvenue',
+      step0Intro: 'Cet agent vous guidera à travers des questions sur votre vie et générera un livre autobiographique au format Word (DOCX) à la fin.',
+      apiKeyLabel: 'Clé API Claude',
+      apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Votre clé est utilisée directement dans le navigateur et n\'est jamais stockée.',
+      authorNameLabel: 'Votre nom complet',
+      authorNamePlaceholder: 'Tel que vous voulez apparaître dans le livre',
+      startBtn: 'Commencer mon histoire →',
+      nextBtn: 'Continuer →',
+      skipBtn: 'Passer cette question',
+      finishBtn: 'Générer mon livre',
+      downloadBtn: '⬇ Télécharger DOCX',
+      restartBtn: 'Nouvelle histoire',
+      generating: 'Génération...',
+      thinking: 'Réflexion...',
+      followupLabel: 'CLAUDE DEMANDE',
+      yourAnswerLabel: 'VOTRE RÉPONSE',
+      chaptersProgress: 'Chapitres terminés',
+      finalTitle: 'Votre livre est prêt !',
+      finalMessage: 'Votre histoire a été préservée. Le fichier DOCX est prêt à télécharger — vous pouvez le modifier, l\'imprimer ou le partager avec votre famille.',
+      errorApiKey: 'Veuillez entrer votre clé API Claude.',
+      errorName: 'Veuillez entrer votre nom.',
+      errorApi: 'Erreur API : ',
+      progressLabel: 'Chapitre',
+      of: 'sur',
+    },
+    chapters: [
+      { title: 'Qui je suis',          questions: ['Quel est votre nom complet ? Où êtes-vous né(e) ? En quelle année ?', 'Comment décririez-vous vos origines — votre famille, votre ville, votre environnement ?'] },
+      { title: 'Enfance & famille',    questions: ['Parlez-moi de votre enfance. À quoi ressemblait votre maison ? Qui étaient les personnes les plus proches de vous ?', 'Quel souvenir d\'enfance portez-vous le plus dans votre cœur ? Pourquoi est-il spécial ?'] },
+      { title: 'École & jeunesse',     questions: ['Comment se sont passées vos années scolaires ? Y avait-il quelque chose que vous adoriez apprendre ou faire ?', 'Qui étaient les professeurs ou amis qui ont marqué votre jeunesse ?'] },
+      { title: 'Travail & carrière',   questions: ['Comment a débuté votre vie professionnelle ? Quel a été votre premier emploi ?', 'Quelle réussite professionnelle considérez-vous la plus significative ? Que représentait-elle pour vous ?'] },
+      { title: 'Amour & relations',    questions: ['Parlez-moi des personnes que vous avez aimées — famille, partenaire, amis proches.', 'Quelle relation a façonné la personne que vous êtes aujourd\'hui ? De quelle manière ?'] },
+      { title: 'Moments fondateurs',   questions: ['Y a-t-il eu un moment — une perte, un tournant, une surprise — qui a changé le cours de votre vie ?', 'Si vous pouviez revenir en arrière et changer quelque chose, que serait-ce ? Et pourquoi finalement non ?'] },
+      { title: 'Ce que la vie m\'a appris', questions: ['Qu\'est-ce que la vie vous a appris qu\'aucune école n\'aurait pu enseigner ?', 'Quelle est votre conviction la plus profonde sur la façon de vivre ?'] },
+      { title: 'Message aux générations futures', questions: ['Que diriez-vous à vos enfants, petits-enfants ou à tout jeune qui lirait ce livre ?', 'Comment aimeriez-vous être rappelé(e) ?'] },
+    ],
+  },
+};
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const HARDCODED_KEYS = {
+  groq:   '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',
+  gemini: 'AIzaSyDhBtD56KjHS6VesK1sXVJIlgm6pWY_ztY',
+  claude: '',
+};
+
+const state = {
+  lang: null,
+  provider: 'groq',
+  apiKey: HARDCODED_KEYS.groq,
+  authorName: '',
+  chapterIdx: 0,
+  questionIdx: 0,
+  answers: [],
+  pendingAnswer: '',
+  pendingFollowup: '',
+  followupQuestion: null,
+  awaitingFollowup: false,
+  docxBlob: null,
+};
+
+// ── Provider configs ──────────────────────────────────
+const PROVIDERS = {
+  gemini: { label: 'Google Gemini (gratuito)', placeholder: 'AIza...', model: 'gemini-2.0-flash' },
+  groq:   { label: 'Groq (gratuito)',          placeholder: 'gsk_...',  model: 'llama-3.3-70b-versatile' },
+  claude: { label: 'Claude / Anthropic (pago)', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514' },
+};
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const screen = () => $('screen');
+const t = () => LANGS[state.lang].ui;
+const chapters = () => LANGS[state.lang].chapters;
+
+function setProgress(current, total) {
+  const pct = total ? Math.round((current / total) * 100) : 0;
+  $('progress-fill').style.width = pct + '%';
+  $('progress-current').textContent = `${t().progressLabel} ${current} ${t().of} ${total}`;
+  $('progress-pct').textContent = pct + '%';
+}
+
+function showError(msg) {
+  const el = document.createElement('div');
+  el.className = 'notice error';
+  el.textContent = msg;
+  screen().prepend(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  UNIFIED AI CALL
+// ═══════════════════════════════════════════════════════
+async function callAI(systemPrompt, userMessage, maxTokens = 600) {
+  const p = state.provider;
+  const key = state.apiKey;
+
+  // ── Gemini ──────────────────────────────────────────
+  if (p === 'gemini') {
+    const model = PROVIDERS.gemini.model;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.8 },
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || res.statusText);
+    }
+    const data = await res.json();
+    return data.candidates[0].content.parts[0].text.trim();
+  }
+
+  // ── Groq ─────────────────────────────────────────────
+  if (p === 'groq') {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: PROVIDERS.groq.model,
+        max_tokens: maxTokens,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: userMessage },
+        ],
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || res.statusText);
+    }
+    const data = await res.json();
+    return data.choices[0].message.content.trim();
+  }
+
+  // ── Claude ───────────────────────────────────────────
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: PROVIDERS.claude.model,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || res.statusText);
+  }
+  const data = await res.json();
+  return data.content[0].text.trim();
+}
+
+async function getFollowupQuestion(chapterTitle, originalQuestion, answer) {
+  const lang = state.lang;
+  const systemMap = {
+    pt: `Você é um entrevistador empático conduzindo uma entrevista biográfica em português. 
+Com base na resposta da pessoa, faça UMA pergunta de aprofundamento calorosa e específica que explore um detalhe ou emoção que ela mencionou.
+Seja breve (máximo 2 frases). NÃO faça introduções longas. Responda APENAS com a pergunta de acompanhamento.`,
+    en: `You are an empathetic interviewer conducting a biographical interview in English.
+Based on the person's answer, ask ONE warm, specific follow-up question that explores a detail or emotion they mentioned.
+Be brief (max 2 sentences). NO long introductions. Respond ONLY with the follow-up question.`,
+    de: `Sie sind ein einfühlsamer Interviewer, der ein biografisches Interview auf Deutsch führt.
+Stellen Sie basierend auf der Antwort der Person EINE warme, spezifische Folgefrage, die ein Detail oder eine Emotion erkundet.
+Seien Sie kurz (maximal 2 Sätze). Antworten Sie NUR mit der Folgefrage.`,
+    es: `Eres un entrevistador empático conduciendo una entrevista biográfica en español.
+Basándote en la respuesta de la persona, haz UNA pregunta de seguimiento cálida y específica que explore un detalle o emoción que mencionó.
+Sé breve (máximo 2 oraciones). Responde SOLO con la pregunta de seguimiento.`,
+    fr: `Vous êtes un intervieweur empathique conduisant un entretien biographique en français.
+Sur la base de la réponse de la personne, posez UNE question de suivi chaleureuse et spécifique qui explore un détail ou une émotion mentionnée.
+Soyez bref (maximum 2 phrases). Répondez UNIQUEMENT avec la question de suivi.`,
+  };
+  const sys = systemMap[lang] || systemMap.en;
+  const user = `Capítulo/Kapitel/Chapter: ${chapterTitle}\nPergunta/Frage/Question: ${originalQuestion}\nResposta/Antwort/Answer: ${answer}`;
+  return callAI(sys, user, 600);
+}
+
+async function generateNarrative(chapterTitle, qas) {
+  const lang = state.lang;
+  const systemMap = {
+    pt: `Você é um escritor biográfico sensível e literário escrevendo em português.
+Escreva um texto narrativo fluido para um capítulo de autobiografia baseado nas perguntas e respostas fornecidas.
+- Escreva na primeira pessoa, como se fosse a voz da própria pessoa
+- Preserve todos os detalhes factuais e emocionais das respostas
+- Use linguagem rica mas acessível, com calor humano
+- 3 a 5 parágrafos
+- NÃO inclua título de capítulo
+- NÃO use marcadores ou listas`,
+    en: `You are a sensitive, literary biographical writer writing in English.
+Write a fluid narrative text for an autobiography chapter based on the provided questions and answers.
+- Write in first person, as if it were the person's own voice
+- Preserve all factual and emotional details from the answers
+- Use rich but accessible language with warmth
+- 3 to 5 paragraphs
+- Do NOT include the chapter title
+- Do NOT use bullet points or lists`,
+    de: `Sie sind ein einfühlsamer, literarischer Biografieschreiber auf Deutsch.
+Schreiben Sie einen fließenden Erzähltext für ein Autobiografiekapitel auf Basis der bereitgestellten Fragen und Antworten.
+- Schreiben Sie in der ersten Person, als ob es die Stimme der Person selbst wäre
+- Bewahren Sie alle sachlichen und emotionalen Details der Antworten
+- Verwenden Sie eine reiche, aber zugängliche Sprache mit Wärme
+- 3 bis 5 Absätze
+- Fügen Sie KEINEN Kapiteltitel ein
+- Verwenden Sie KEINE Aufzählungszeichen`,
+    es: `Eres un escritor biográfico sensible y literario escribiendo en español.
+Escribe un texto narrativo fluido para un capítulo de autobiografía basado en las preguntas y respuestas proporcionadas.
+- Escribe en primera persona, como si fuera la voz de la propia persona
+- Preserva todos los detalles factuales y emocionales de las respuestas
+- Usa un lenguaje rico pero accesible, con calidez humana
+- 3 a 5 párrafos
+- NO incluyas el título del capítulo
+- NO uses viñetas o listas`,
+    fr: `Vous êtes un écrivain biographique sensible et littéraire écrivant en français.
+Rédigez un texte narratif fluide pour un chapitre d'autobiographie basé sur les questions et réponses fournies.
+- Écrivez à la première personne, comme si c'était la voix de la personne elle-même
+- Préservez tous les détails factuels et émotionnels des réponses
+- Utilisez un langage riche mais accessible, avec chaleur humaine
+- 3 à 5 paragraphes
+- N'incluez PAS le titre du chapitre
+- N'utilisez PAS de puces ou de listes`,
+  };
+  const sys = systemMap[lang] || systemMap.en;
+  let user = `Capítulo/Chapter: ${chapterTitle}\n\n`;
+  for (const qa of qas) {
+    user += `P: ${qa.question}\nR: ${qa.answer}\n`;
+    if (qa.followup && qa.followupAnswer) {
+      user += `P (detalhe): ${qa.followup}\nR: ${qa.followupAnswer}\n`;
+    }
+    user += '\n';
+  }
+  return callAI(sys, user, 1000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  DOCX GENERATION (pure JS, no CDN dependency)
+// ═══════════════════════════════════════════════════════
+
+// Minimal DEFLATE-raw via CompressionStream (supported in all modern browsers)
+async function deflateRaw(data) {
+  const cs = new CompressionStream('deflate-raw');
+  const writer = cs.writable.getWriter();
+  writer.write(data);
+  writer.close();
+  const chunks = [];
+  const reader = cs.readable.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const total = chunks.reduce((s, c) => s + c.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  return out;
+}
+
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  const table = crc32.table || (crc32.table = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c;
+    }
+    return t;
+  })());
+  for (let i = 0; i < data.length; i++) crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function u16le(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
+function u32le(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
+
+async function buildZip(files) {
+  // files: [{name, data: Uint8Array}]
+  const enc = new TextEncoder();
+  const entries = [];
+  let offset = 0;
+  const parts = [];
+
+  for (const f of files) {
+    const nameBytes = enc.encode(f.name);
+    const compressed = await deflateRaw(f.data);
+    const crc = crc32(f.data);
+    const localHeader = new Uint8Array([
+      0x50,0x4B,0x03,0x04,       // sig
+      0x14,0x00,                  // version needed: 2.0
+      0x00,0x00,                  // flags
+      0x08,0x00,                  // compression: deflate
+      0x00,0x00,0x00,0x00,        // mod time/date
+      ...u32le(crc),
+      ...u32le(compressed.length),
+      ...u32le(f.data.length),
+      ...u16le(nameBytes.length),
+      0x00,0x00,                  // extra field length
+      ...nameBytes,
+    ]);
+    entries.push({ nameBytes, crc, compSize: compressed.length, uncompSize: f.data.length, offset });
+    parts.push(localHeader, compressed);
+    offset += localHeader.length + compressed.length;
+  }
+
+  // Central directory
+  const cdParts = [];
+  for (const e of entries) {
+    const cd = new Uint8Array([
+      0x50,0x4B,0x01,0x02,
+      0x14,0x00,0x14,0x00,
+      0x00,0x00,
+      0x08,0x00,
+      0x00,0x00,0x00,0x00,
+      ...u32le(e.crc),
+      ...u32le(e.compSize),
+      ...u32le(e.uncompSize),
+      ...u16le(e.nameBytes.length),
+      0x00,0x00,0x00,0x00,0x00,0x00,
+      0x00,0x00,0x00,0x00,
+      ...u32le(e.offset),
+      ...e.nameBytes,
+    ]);
+    cdParts.push(cd);
+  }
+  const cdData = concat(cdParts);
+  const eocd = new Uint8Array([
+    0x50,0x4B,0x05,0x06,
+    0x00,0x00,0x00,0x00,
+    ...u16le(entries.length),
+    ...u16le(entries.length),
+    ...u32le(cdData.length),
+    ...u32le(offset),
+    0x00,0x00,
+  ]);
+  return concat([...parts, cdData, eocd]);
+}
+
+function concat(arrays) {
+  const total = arrays.reduce((s, a) => s + a.length, 0);
+  const out = new Uint8Array(total);
+  let off = 0;
+  for (const a of arrays) { out.set(a, off); off += a.length; }
+  return out;
+}
+
+function xmlEsc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&apos;');
+}
+
+function makeParaXml(text, opts = {}) {
+  const { bold, size = 24, color = '2B2416', center = false,
+          italic = false, pageBreak = false, spaceBefore = 0,
+          spaceAfter = 200, firstIndent = 0, heading = false } = opts;
+  const pPr = `<w:pPr>
+      ${heading ? `<w:pStyle w:val="Heading1"/>` : ''}
+      ${center ? `<w:jc w:val="center"/>` : ''}
+      ${pageBreak ? `<w:pageBreakBefore/>` : ''}
+      <w:spacing w:before="${spaceBefore}" w:after="${spaceAfter}" w:line="360" w:lineRule="auto"/>
+      ${firstIndent ? `<w:ind w:firstLine="${firstIndent}"/>` : ''}
+    </w:pPr>`;
+  const rPr = `<w:rPr>
+      <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
+      <w:sz w:val="${size}"/><w:szCs w:val="${size}"/>
+      ${bold ? `<w:b/><w:bCs/>` : ''}
+      ${italic ? `<w:i/><w:iCs/>` : ''}
+      <w:color w:val="${color}"/>
+    </w:rPr>`;
+  return `<w:p>${pPr}<w:r>${rPr}<w:t xml:space="preserve">${xmlEsc(text)}</w:t></w:r></w:p>`;
+}
+
+async function generateDocx(narratives) {
+  const enc = new TextEncoder();
+  const chapsList = chapters();
+
+  const titleMap = { pt:'Minha História de Vida', en:'My Life Story', de:'Meine Lebensgeschichte', es:'Mi Historia de Vida', fr:'Mon Histoire de Vie' };
+  const byMap    = { pt:'por', en:'by', de:'von', es:'por', fr:'par' };
+  const dateStr  = new Date().toLocaleDateString(
+    state.lang==='pt'?'pt-BR': state.lang==='de'?'de-DE': state.lang==='es'?'es-ES': state.lang==='fr'?'fr-FR':'en-US',
+    { year:'numeric', month:'long' }
+  );
+
+  const bookTitle = titleMap[state.lang] || titleMap.en;
+  const byWord    = byMap[state.lang]    || byMap.en;
+
+  // ── Build document.xml ────────────────────────────────
+  let body = '';
+
+  // Title page
+  body += makeParaXml('', { spaceAfter: 0, spaceBefore: 2880 });
+  body += makeParaXml(bookTitle,                        { bold:true, size:52, center:true, spaceAfter:360, spaceBefore:0 });
+  body += makeParaXml(`${byWord} ${state.authorName}`,  { italic:true, size:28, color:'5C4F3A', center:true, spaceAfter:240, spaceBefore:0 });
+  body += makeParaXml(dateStr,                          { size:22, color:'9A8B73', center:true, spaceAfter:0, spaceBefore:0 });
+  body += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+
+  // Chapters
+  for (let i = 0; i < narratives.length; i++) {
+    const narrative = narratives[i];
+    if (!narrative) continue;
+    const chap = chapsList[i];
+
+    body += makeParaXml(`${i+1}. ${chap.title}`, {
+      heading: true, bold: true, size: 36, spaceBefore: 0, spaceAfter: 240,
+    });
+
+    const paras = narrative.split(/\n+/).filter(p => p.trim());
+    for (const para of paras) {
+      body += makeParaXml(para, { firstIndent: 720, spaceAfter: 200 });
+    }
+
+    if (i < narratives.length - 1) {
+      body += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+    }
+  }
+
+  const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body>
+    ${body}
+    <w:sectPr>
+      <w:footerReference w:type="default" r:id="rId1"/>
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1800" w:left="1800"/>
+    </w:sectPr>
+  </w:body>
+</w:document>`;
+
+  // ── Footer ────────────────────────────────────────────
+  const footerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:p>
+    <w:pPr><w:jc w:val="center"/></w:pPr>
+    <w:r>
+      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:t xml:space="preserve">${xmlEsc(state.authorName)}  ·  </w:t>
+    </w:r>
+    <w:r>
+      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:fldChar w:fldCharType="begin"/>
+    </w:r>
+    <w:r>
+      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:instrText> PAGE </w:instrText>
+    </w:r>
+    <w:r>
+      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:fldChar w:fldCharType="end"/>
+    </w:r>
+  </w:p>
+</w:ftr>`;
+
+  // ── Styles ────────────────────────────────────────────
+  const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:docDefaults>
+    <w:rPrDefault><w:rPr>
+      <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
+      <w:sz w:val="24"/><w:szCs w:val="24"/>
+    </w:rPr></w:rPrDefault>
+  </w:docDefaults>
+  <w:style w:type="paragraph" w:styleId="Normal">
+    <w:name w:val="Normal"/>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:basedOn w:val="Normal"/>
+    <w:pPr>
+      <w:spacing w:before="480" w:after="240"/>
+      <w:outlineLvl w:val="0"/>
+      <w:pBdr><w:bottom w:val="single" w:sz="4" w:space="8" w:color="C97B2A"/></w:pBdr>
+    </w:pPr>
+    <w:rPr>
+      <w:b/><w:bCs/>
+      <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
+      <w:sz w:val="36"/><w:szCs w:val="36"/>
+      <w:color w:val="2B2416"/>
+    </w:rPr>
+  </w:style>
+</w:styles>`;
+
+  // ── Relationships ─────────────────────────────────────
+  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+  const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml"  ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml"   ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/footer1.xml"  ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
+</Types>`;
+
+  const files = [
+    { name: '[Content_Types].xml',       data: enc.encode(contentTypesXml) },
+    { name: '_rels/.rels',               data: enc.encode(rootRelsXml) },
+    { name: 'word/document.xml',         data: enc.encode(documentXml) },
+    { name: 'word/styles.xml',           data: enc.encode(stylesXml) },
+    { name: 'word/footer1.xml',          data: enc.encode(footerXml) },
+    { name: 'word/_rels/document.xml.rels', data: enc.encode(relsXml) },
+  ];
+
+  const zipData = await buildZip(files);
+  return new Blob([zipData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SCREENS
+// ═══════════════════════════════════════════════════════
+
+// ── Screen 0: Language selection ─────────────────────
+function renderLangScreen() {
+  screen().innerHTML = `
+    <div class="card">
+      <p style="font-family:'Lora',serif; font-size:1.1rem; margin-bottom:1.5rem; color:var(--ink-mid);">
+        Choose your language / Escolha seu idioma / Sprache wählen
+      </p>
+      <div class="lang-grid">
+        ${Object.entries(LANGS).map(([code, l]) => `
+          <button class="lang-btn" data-lang="${code}">
+            <span class="lang-flag">${l.flag}</span>
+            ${l.label}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  // Check for backup in localStorage
+  try {
+    const backup = localStorage.getItem('bio_backup');
+    if (backup) {
+      const b = JSON.parse(backup);
+      const saved = new Date(b.savedAt).toLocaleString();
+      const banner = document.createElement('div');
+      banner.className = 'notice info';
+      banner.style.cssText = 'margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;';
+      banner.innerHTML = `
+        <span>💾 Backup encontrado: <strong>${b.authorName}</strong> — ${b.answers.length} respostas (${saved})</span>
+        <button id="restore-btn" class="btn btn-secondary" style="font-size:.82rem; padding:.4rem .9rem;">Restaurar</button>
+      `;
+      screen().prepend(banner);
+      document.getElementById('restore-btn').addEventListener('click', () => {
+        state.lang       = b.lang;
+        state.authorName = b.authorName;
+        state.answers    = b.answers;
+        // restore position to generate screen
+        state.chapterIdx  = 7;
+        state.questionIdx = 1;
+        document.getElementById('main-title').textContent    = LANGS[b.lang].ui.appTitle;
+        document.getElementById('main-subtitle').textContent = LANGS[b.lang].ui.appSubtitle;
+        document.documentElement.lang = b.lang;
+        renderGenerateScreen();
+      });
+    }
+  } catch(e) {}
+
+  screen().querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.lang = btn.dataset.lang;
+      document.getElementById('main-title').textContent    = LANGS[state.lang].ui.appTitle;
+      document.getElementById('main-subtitle').textContent = LANGS[state.lang].ui.appSubtitle;
+      document.documentElement.lang = state.lang;
+      renderSetupScreen();
+    });
+  });
+}
+
+// ── Screen 1: Provider + name ─────────────────────────
+function renderSetupScreen() {
+  const ui = t();
+  screen().innerHTML = `
+    <div class="card">
+      <h2 style="font-family:'Lora',serif; margin-bottom:1.25rem; font-size:1.3rem;">${ui.step0Title}</h2>
+      <p style="color:var(--ink-mid); margin-bottom:1.75rem;">${ui.step0Intro}</p>
+
+      <div class="field">
+        <label for="provider-select">Provedor de IA / AI Provider</label>
+        <div style="position:relative;">
+          <select id="provider-select">
+            <option value="groq" selected>🟢 Groq (Llama 3.3) — gratuito</option>
+            <option value="gemini">🟢 Google Gemini — gratuito</option>
+            <option value="claude">🔵 Claude / Anthropic — pago</option>
+          </select>
+          <span style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink-light);">▾</span>
+        </div>
+      </div>
+
+      <div id="custom-key-field" style="display:none;" class="field">
+        <label for="api-key">API Key</label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="author-name">${ui.authorNameLabel}</label>
+        <input type="text" id="author-name" placeholder="${ui.authorNamePlaceholder}" />
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="start-btn">${ui.startBtn}</button>
+      </div>
+    </div>
+  `;
+
+  $('provider-select').addEventListener('change', () => {
+    const p = $('provider-select').value;
+    state.provider = p;
+    // Show key field only for Claude (not hardcoded)
+    $('custom-key-field').style.display = p === 'claude' ? 'block' : 'none';
+    if (p !== 'claude') state.apiKey = HARDCODED_KEYS[p];
+  });
+
+  $('start-btn').addEventListener('click', () => {
+    const name = $('author-name').value.trim();
+    if (!name) { showError(ui.errorName); return; }
+    state.provider   = $('provider-select').value;
+    if (state.provider === 'claude') {
+      const key = ($('api-key') && $('api-key').value.trim());
+      if (!key) { showError(ui.errorApiKey); return; }
+      state.apiKey = key;
+    }
+    state.authorName  = name;
+    state.chapterIdx  = 0;
+    state.questionIdx = 0;
+    state.answers     = [];
+    renderQuestionScreen();
+  });
+}
+
+// ── Screen 2: Question + optional follow-up ───────────
+function renderQuestionScreen() {
+  const ui    = t();
+  const chaps = chapters();
+  const totalQ = chaps.reduce((s, c) => s + c.questions.length, 0);
+  let currentQ = 0;
+  for (let i = 0; i < state.chapterIdx; i++) currentQ += chaps[i].questions.length;
+  currentQ += state.questionIdx;
+
+  const chap = chaps[state.chapterIdx];
+  const question = chap.questions[state.questionIdx];
+
+  // reset transient state
+  state.followupQuestion  = null;
+  state.awaitingFollowup  = false;
+  state.pendingAnswer     = '';
+  state.pendingFollowup   = '';
+
+  screen().innerHTML = `
+    <div id="progress-wrap">
+      <div id="progress-label">
+        <span id="progress-current"></span>
+        <span id="progress-pct"></span>
+      </div>
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div class="card" id="question-card">
+      <div class="chapter-title">${chap.title}</div>
+      <div class="question-text">${question}</div>
+
+      <div id="ai-response-zone"></div>
+
+      <label class="followup-label" id="answer-label" style="margin-bottom:.5rem;">${ui.yourAnswerLabel}</label>
+      <textarea id="answer-box" placeholder="..." rows="5"></textarea>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="next-btn">${ui.nextBtn}</button>
+        <button class="btn btn-secondary" id="skip-btn">${ui.skipBtn}</button>
+      </div>
+    </div>
+  `;
+
+  setProgress(state.chapterIdx + 1, chaps.length);
+
+  $('next-btn').addEventListener('click', () => handleNextClick(question, chap.title));
+  $('skip-btn').addEventListener('click', () => advanceQuestion(question, chap.title, '', null, ''));
+}
+
+async function handleNextClick(question, chapterTitle) {
+  const ui = t();
+  const answer = $('answer-box').value.trim();
+
+  // Phase 1: user answered main question → get follow-up
+  if (!state.awaitingFollowup) {
+    if (!answer) return;
+    state.pendingAnswer    = answer;
+    state.awaitingFollowup = true;
+
+    // disable + show spinner
+    const nextBtn = $('next-btn');
+    const skipBtn = $('skip-btn');
+    nextBtn.disabled = skipBtn.disabled = true;
+    nextBtn.innerHTML = `<span class="spinner"></span> ${ui.thinking}`;
+
+    try {
+      const fq = await getFollowupQuestion(chapterTitle, question, answer);
+      state.followupQuestion = fq;
+
+      const zone = $('ai-response-zone');
+      zone.innerHTML = `
+        <div class="ai-response"><strong>✦</strong> ${fq}</div>
+        <label class="followup-label" style="margin-bottom:.5rem;">${ui.followupLabel}</label>
+      `;
+      $('answer-label').style.display = 'none';
+      $('answer-box').value = '';
+      $('answer-box').placeholder = '...';
+      nextBtn.innerHTML = ui.nextBtn;
+      nextBtn.disabled  = false;
+      skipBtn.disabled  = false;
+    } catch (e) {
+      // If follow-up fails, just advance
+      advanceQuestion(question, chapterTitle, answer, null, '');
+    }
+
+  // Phase 2: user answered follow-up → advance
+  } else {
+    state.pendingFollowup = $('answer-box').value.trim();
+    advanceQuestion(question, chapterTitle, state.pendingAnswer, state.followupQuestion, state.pendingFollowup);
+  }
+}
+
+function advanceQuestion(question, chapterTitle, answer, followup, followupAnswer) {
+  const chaps = chapters();
+  state.answers.push({
+    chapter:         chapterTitle,
+    chapterIdx:      state.chapterIdx,
+    question,
+    answer,
+    followup,
+    followupAnswer,
+  });
+  // Auto-save to localStorage after every answer
+  try {
+    localStorage.setItem('bio_backup', JSON.stringify({
+      lang: state.lang,
+      authorName: state.authorName,
+      answers: state.answers,
+      savedAt: new Date().toISOString(),
+    }));
+  } catch(e) {}
+
+  const chap = chaps[state.chapterIdx];
+  if (state.questionIdx < chap.questions.length - 1) {
+    state.questionIdx++;
+  } else if (state.chapterIdx < chaps.length - 1) {
+    state.chapterIdx++;
+    state.questionIdx = 0;
+  } else {
+    renderGenerateScreen();
+    return;
+  }
+  renderQuestionScreen();
+}
+
+// ── Screen 3: Generate ────────────────────────────────
+function renderGenerateScreen() {
+  const ui    = t();
+  const chaps = chapters();
+
+  // Group answers by chapter
+  const byChapter = {};
+  for (const a of state.answers) {
+    if (!byChapter[a.chapterIdx]) byChapter[a.chapterIdx] = [];
+    byChapter[a.chapterIdx].push(a);
+  }
+
+  const chapterItems = chaps.map((c, i) => {
+    const done = byChapter[i] && byChapter[i].some(a => a.answer);
+    return `<li><span class="chap-num">${i+1}</span> <span>${c.title}</span> ${done ? `<span class="chap-done" style="margin-left:auto;">✓</span>` : ''}</li>`;
+  }).join('');
+
+  screen().innerHTML = `
+    <div class="card">
+      <div class="chapter-title">${ui.chaptersProgress}</div>
+      <ul class="chapter-list">${chapterItems}</ul>
+      <div class="btn-row" style="margin-top:1.75rem;">
+        <button class="btn btn-primary" id="generate-btn">${ui.finishBtn}</button>
+        <button class="btn btn-secondary" id="backup-btn">⬇ Salvar respostas (JSON)</button>
+      </div>
+      <div id="gen-status"></div>
+    </div>
+  `;
+
+  $('generate-btn').addEventListener('click', () => runGeneration(byChapter, chaps));
+
+  $('backup-btn').addEventListener('click', () => {
+    const data = JSON.stringify({
+      lang: state.lang,
+      authorName: state.authorName,
+      answers: state.answers,
+      savedAt: new Date().toISOString(),
+    }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url2 = URL.createObjectURL(blob);
+      const a2 = document.createElement('a');
+      a2.href = url2; a2.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
+      document.body.appendChild(a2); a2.click();
+      setTimeout(() => { URL.revokeObjectURL(url2); a2.remove(); }, 1000);
+  });
+}
+
+async function runGeneration(byChapter, chaps) {
+  const ui = t();
+  const genBtn = $('generate-btn');
+  const status = $('gen-status');
+  genBtn.disabled = true;
+  genBtn.innerHTML = `<span class="spinner" style="border-top-color:var(--amber); border-color:rgba(201,123,42,.2);"></span> ${ui.generating}`;
+
+  const narratives = [];
+  for (let i = 0; i < chaps.length; i++) {
+    const qas = byChapter[i];
+    if (!qas || !qas.some(a => a.answer)) {
+      narratives.push(null);
+      continue;
+    }
+    status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">${chaps[i].title}…</p>`;
+    try {
+      const narrative = await generateNarrative(chaps[i].title, qas);
+      narratives.push(narrative);
+    } catch (e) {
+      narratives.push(qas.map(a => a.answer).filter(Boolean).join('\n\n'));
+    }
+  }
+
+  status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">📄 DOCX…</p>`;
+  try {
+    const blob = await generateDocx(narratives);
+    state.docxBlob = blob;
+    renderFinalScreen();
+  } catch (e) {
+    genBtn.disabled = false;
+    genBtn.innerHTML = ui.finishBtn;
+    showError(ui.errorApi + e.message);
+  }
+}
+
+// ── Screen 4: Final ───────────────────────────────────
+function renderFinalScreen() {
+  const ui = t();
+  screen().innerHTML = `
+    <div class="card final-hero">
+      <div class="big-icon">📖</div>
+      <h2>${ui.finalTitle}</h2>
+      <p>${ui.finalMessage}</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="dl-btn">${ui.downloadBtn}</button>
+        <button class="btn btn-secondary" id="restart-btn">${ui.restartBtn}</button>
+      </div>
+    </div>
+  `;
+
+  $('dl-btn').addEventListener('click', () => {
+    const filename = `${state.authorName.replace(/\s+/g, '_')}_historia.docx`;
+    const url = URL.createObjectURL(state.docxBlob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+  });
+
+  $('restart-btn').addEventListener('click', () => {
+    state.lang = null; state.apiKey = ''; state.authorName = '';
+    state.chapterIdx = 0; state.questionIdx = 0;
+    state.answers = []; state.docxBlob = null;
+    renderLangScreen();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════
+// Inject the persistent progress bar into header area
+const progWrapGlobal = document.createElement('div');
+progWrapGlobal.id = 'progress-wrap';
+progWrapGlobal.innerHTML = `
+  <div id="progress-label">
+    <span id="progress-current"></span>
+    <span id="progress-pct"></span>
+  </div>
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+`;
+// Will be rendered per-screen; boot
+renderLangScreen();
+</script>
+</body>
+</html>
