@@ -4,73 +4,85 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agente Biográfico</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
-    /* ── Design tokens ─────────────────────────────────── */
     :root {
-      --cream:       #F9F5EF;
-      --parchment:   #EFE8DA;
+      --cream:       #F7F2EA;
+      --parchment:   #EDE4D3;
       --ink:         #2B2416;
       --ink-mid:     #5C4F3A;
       --ink-light:   #9A8B73;
       --amber:       #C97B2A;
       --amber-light: #E8A84E;
       --amber-pale:  #FBF0DE;
+      --amber-deep:  #A0601A;
       --red-warn:    #B03A2E;
       --radius:      10px;
-      --shadow:      0 4px 24px rgba(43,36,22,.10);
+      --shadow:      0 4px 28px rgba(43,36,22,.09);
       --transition:  .25s ease;
     }
 
-    /* ── Reset / base ───────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; scroll-behavior: smooth; }
+
     body {
       font-family: 'Source Sans 3', sans-serif;
-      background: var(--cream);
+      background-color: var(--cream);
+      background-image:
+        radial-gradient(ellipse at 20% 0%, rgba(201,123,42,.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 100%, rgba(201,123,42,.04) 0%, transparent 50%);
       color: var(--ink);
       min-height: 100vh;
       line-height: 1.65;
     }
 
-    /* ── Layout ─────────────────────────────────────────── */
     #app {
-      max-width: 720px;
+      max-width: 680px;
       margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
+      padding: 2rem 1.5rem 5rem;
     }
 
     /* ── Header ─────────────────────────────────────────── */
     header {
       text-align: center;
-      padding: 3rem 0 2rem;
-      border-bottom: 2px solid var(--parchment);
+      padding: 3.5rem 0 2.5rem;
       margin-bottom: 2.5rem;
+      position: relative;
+    }
+    header::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      margin: 0 auto;
+      margin-top: 2rem;
     }
     header .ornament {
-      font-size: 2rem;
-      line-height: 1;
+      font-size: 1.1rem;
       color: var(--amber);
-      letter-spacing: .2em;
-      margin-bottom: .75rem;
+      letter-spacing: .35em;
+      margin-bottom: 1rem;
       display: block;
+      opacity: .7;
     }
     header h1 {
       font-family: 'Lora', serif;
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-size: clamp(1.7rem, 4.5vw, 2.4rem);
       font-weight: 600;
-      letter-spacing: -.01em;
+      letter-spacing: -.02em;
       color: var(--ink);
+      line-height: 1.2;
     }
     header p.subtitle {
-      color: var(--ink-mid);
-      font-size: .95rem;
-      margin-top: .4rem;
+      color: var(--ink-light);
+      font-size: 1rem;
+      margin-top: .6rem;
       font-weight: 300;
+      font-style: italic;
+      font-family: 'Lora', serif;
     }
 
     /* ── Cards ──────────────────────────────────────────── */
@@ -78,59 +90,83 @@
       background: #fff;
       border: 1px solid var(--parchment);
       border-radius: var(--radius);
-      padding: 2rem;
+      padding: 2.25rem;
       box-shadow: var(--shadow);
       margin-bottom: 1.5rem;
-      animation: fadeUp .4s ease both;
+      animation: fadeUp .45s ease both;
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
+      from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── Progress bar ───────────────────────────────────── */
-    #progress-wrap {
-      margin-bottom: 1.75rem;
-    }
+    /* ── Progress ───────────────────────────────────────── */
+    #progress-wrap { margin-bottom: 2rem; }
     #progress-label {
       display: flex;
       justify-content: space-between;
-      font-size: .78rem;
+      font-size: .75rem;
       color: var(--ink-light);
-      margin-bottom: .45rem;
+      margin-bottom: .5rem;
       font-weight: 600;
-      letter-spacing: .04em;
+      letter-spacing: .06em;
       text-transform: uppercase;
     }
     #progress-bar {
-      height: 5px;
+      height: 3px;
       background: var(--parchment);
       border-radius: 99px;
       overflow: hidden;
     }
     #progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--amber), var(--amber-light));
+      background: linear-gradient(90deg, var(--amber-deep), var(--amber-light));
       border-radius: 99px;
-      transition: width .5s cubic-bezier(.4,0,.2,1);
+      transition: width .6s cubic-bezier(.4,0,.2,1);
       width: 0%;
     }
 
-    /* ── Chapter title ──────────────────────────────────── */
+    /* ── Chapter header ─────────────────────────────────── */
+    .chapter-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+    .chapter-number {
+      font-family: 'Lora', serif;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--amber);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: .8;
+    }
+    .chapter-number-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--parchment), transparent);
+    }
     .chapter-title {
       font-family: 'Lora', serif;
-      font-size: 1.25rem;
-      color: var(--amber);
-      font-weight: 400;
+      font-size: 1.45rem;
+      color: var(--ink);
+      font-weight: 600;
       font-style: italic;
-      margin-bottom: .25rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.3;
     }
     .question-text {
       font-size: 1.15rem;
-      font-weight: 600;
+      font-weight: 400;
       color: var(--ink);
-      line-height: 1.45;
-      margin-bottom: 1.25rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      padding-left: 1rem;
+      border-left: 3px solid var(--amber-light);
     }
 
     /* ── Textarea ───────────────────────────────────────── */
@@ -139,29 +175,29 @@
       min-height: 140px;
       border: 1.5px solid var(--parchment);
       border-radius: var(--radius);
-      padding: .85rem 1rem;
+      padding: .9rem 1.1rem;
       font-family: 'Source Sans 3', sans-serif;
       font-size: 1rem;
       color: var(--ink);
       background: var(--cream);
       resize: vertical;
       transition: border-color var(--transition), box-shadow var(--transition);
-      line-height: 1.6;
+      line-height: 1.7;
     }
     textarea:focus {
       outline: none;
       border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(201,123,42,.12);
+      box-shadow: 0 0 0 3px rgba(201,123,42,.10);
       background: #fff;
     }
-    textarea::placeholder { color: var(--ink-light); }
+    textarea::placeholder { color: var(--ink-light); font-style: italic; }
 
     /* ── Buttons ────────────────────────────────────────── */
     .btn {
       display: inline-flex;
       align-items: center;
       gap: .5rem;
-      padding: .7rem 1.6rem;
+      padding: .75rem 1.75rem;
       border-radius: var(--radius);
       font-family: 'Source Sans 3', sans-serif;
       font-size: .95rem;
@@ -171,35 +207,33 @@
       transition: all var(--transition);
       letter-spacing: .01em;
     }
-    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
     .btn-primary {
-      background: var(--amber);
+      background: linear-gradient(135deg, var(--amber), var(--amber-light));
       color: #fff;
+      box-shadow: 0 2px 12px rgba(201,123,42,.25);
     }
     .btn-primary:not(:disabled):hover {
-      background: var(--amber-light);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(201,123,42,.3);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px rgba(201,123,42,.35);
     }
     .btn-secondary {
       background: transparent;
       border: 1.5px solid var(--parchment);
       color: var(--ink-mid);
     }
-    .btn-secondary:not(:disabled):hover {
-      background: var(--parchment);
-    }
+    .btn-secondary:not(:disabled):hover { background: var(--parchment); }
     .btn-row {
       display: flex;
       gap: .75rem;
-      margin-top: 1.25rem;
+      margin-top: 1.5rem;
       flex-wrap: wrap;
     }
 
     /* ── Inputs ─────────────────────────────────────────── */
     input[type="text"], input[type="password"], select {
       width: 100%;
-      padding: .7rem 1rem;
+      padding: .75rem 1.1rem;
       border: 1.5px solid var(--parchment);
       border-radius: var(--radius);
       font-family: 'Source Sans 3', sans-serif;
@@ -211,34 +245,34 @@
     input[type="text"]:focus, input[type="password"]:focus, select:focus {
       outline: none;
       border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(201,123,42,.12);
+      box-shadow: 0 0 0 3px rgba(201,123,42,.10);
       background: #fff;
     }
     select { appearance: none; cursor: pointer; }
     label {
       display: block;
-      font-size: .85rem;
+      font-size: .8rem;
       font-weight: 600;
       color: var(--ink-mid);
-      margin-bottom: .4rem;
-      letter-spacing: .03em;
+      margin-bottom: .45rem;
+      letter-spacing: .05em;
       text-transform: uppercase;
     }
-    .field { margin-bottom: 1.25rem; }
+    .field { margin-bottom: 1.35rem; }
 
     /* ── Language selector ──────────────────────────────── */
     .lang-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: .65rem;
       margin-bottom: 1.5rem;
     }
     .lang-btn {
-      padding: .65rem .5rem;
+      padding: .75rem .5rem;
       border: 1.5px solid var(--parchment);
       border-radius: var(--radius);
       background: #fff;
-      font-size: .9rem;
+      font-size: .88rem;
       cursor: pointer;
       text-align: center;
       transition: all var(--transition);
@@ -246,43 +280,62 @@
       font-family: 'Source Sans 3', sans-serif;
     }
     .lang-btn:hover { border-color: var(--amber-light); background: var(--amber-pale); }
-    .lang-btn.selected {
-      border-color: var(--amber);
-      background: var(--amber-pale);
-      color: var(--amber);
-      font-weight: 600;
-    }
-    .lang-flag { font-size: 1.3rem; display: block; margin-bottom: .2rem; }
+    .lang-btn.selected { border-color: var(--amber); background: var(--amber-pale); color: var(--amber); font-weight: 600; }
+    .lang-flag { font-size: 1.4rem; display: block; margin-bottom: .25rem; }
 
-    /* ── AI response box ────────────────────────────────── */
-    .ai-response {
-      background: var(--amber-pale);
-      border-left: 3px solid var(--amber);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.25rem;
-      font-size: .97rem;
-      color: var(--ink-mid);
-      line-height: 1.7;
-      font-style: italic;
+    /* ── AI follow-up ───────────────────────────────────── */
+    .ai-followup-wrap {
+      margin: 1.25rem 0;
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(135deg, #fffbf4, var(--amber-pale));
+      border-radius: var(--radius);
+      border: 1px solid rgba(201,123,42,.2);
+      position: relative;
     }
-    .ai-response strong { font-style: normal; color: var(--amber); }
-
-    /* ── Follow-up section ──────────────────────────────── */
-    .followup-label {
-      font-size: .82rem;
+    .ai-followup-wrap::before {
+      content: '\201C';
+      position: absolute;
+      top: -.1rem;
+      left: 1rem;
+      font-family: 'Lora', serif;
+      font-size: 3rem;
+      color: var(--amber-light);
+      line-height: 1;
+      opacity: .5;
+    }
+    .ai-followup-label {
+      font-size: .7rem;
       font-weight: 600;
+      letter-spacing: .1em;
       text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--ink-light);
+      color: var(--amber);
       margin-bottom: .5rem;
     }
+    .ai-followup-text {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink-mid);
+      line-height: 1.7;
+      padding-left: .5rem;
+    }
 
-    /* ── Loading spinner ────────────────────────────────── */
+    /* ── Answer label ───────────────────────────────────── */
+    .answer-label {
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-light);
+      margin-bottom: .5rem;
+      display: block;
+    }
+
+    /* ── Spinner ────────────────────────────────────────── */
     .spinner {
       display: inline-block;
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,.4);
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.35);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin .7s linear infinite;
@@ -290,9 +343,9 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Error / notice ─────────────────────────────────── */
+    /* ── Notices ────────────────────────────────────────── */
     .notice {
-      padding: .75rem 1rem;
+      padding: .8rem 1.1rem;
       border-radius: var(--radius);
       font-size: .9rem;
       margin-bottom: 1rem;
@@ -304,36 +357,17 @@
     .chapter-list { list-style: none; }
     .chapter-list li {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: .75rem;
-      padding: .65rem 0;
+      padding: .7rem 0;
       border-bottom: 1px solid var(--parchment);
       font-size: .93rem;
       color: var(--ink-mid);
     }
     .chapter-list li:last-child { border: none; }
-    .chap-num {
-      font-family: 'Lora', serif;
-      font-weight: 600;
-      color: var(--amber);
-      min-width: 1.4rem;
-    }
-    .chap-done { color: #4a7c59; font-weight: 600; font-size: .8rem; }
+    .chap-num { font-family: 'Lora', serif; font-weight: 600; color: var(--amber); min-width: 1.4rem; }
+    .chap-done { color: #4a7c59; font-weight: 600; font-size: .78rem; margin-left: auto; }
 
-    /* ── Final screen ───────────────────────────────────── */
-    .final-hero {
-      text-align: center;
-      padding: 1.5rem 0;
-    }
-    .final-hero .big-icon { font-size: 3.5rem; }
-    .final-hero h2 {
-      font-family: 'Lora', serif;
-      font-size: 1.6rem;
-      margin: .75rem 0 .5rem;
-    }
-    .final-hero p { color: var(--ink-mid); max-width: 480px; margin: 0 auto 1.5rem; }
-
-    /* ── Responsive ─────────────────────────────────────── */
     /* ── Photo upload ───────────────────────────────────── */
     .photo-upload-area {
       border: 2px dashed var(--parchment);
@@ -342,23 +376,95 @@
       text-align: center;
       cursor: pointer;
       transition: border-color var(--transition), background var(--transition);
-      margin-top: 1rem;
+      margin-top: 1.25rem;
       color: var(--ink-light);
       font-size: .88rem;
     }
     .photo-upload-area:hover { border-color: var(--amber-light); background: var(--amber-pale); }
     .photo-upload-area input[type=file] { display: none; }
-    .photo-thumbs {
-      display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; justify-content: center;
+    .photo-thumbs { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; justify-content: center; }
+    .photo-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 6px; border: 2px solid var(--parchment); filter: sepia(80%); }
+
+    /* ── Generation loading ─────────────────────────────── */
+    .gen-loading {
+      text-align: center;
+      padding: 2rem 1rem;
     }
-    .photo-thumb {
-      width: 64px; height: 64px; object-fit: cover;
-      border-radius: 6px; border: 2px solid var(--parchment);
-      filter: sepia(80%);
+    .gen-loading .gen-icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 1rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: .6; transform: scale(1); }
+      50%       { opacity: 1; transform: scale(1.08); }
+    }
+    .gen-loading .gen-chapter {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--ink-mid);
+      margin-bottom: .5rem;
+    }
+    .gen-loading .gen-phrase {
+      font-size: .88rem;
+      color: var(--ink-light);
+    }
+
+    /* ── Cover card ─────────────────────────────────────── */
+    .cover-section-title {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--ink-mid);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Final screen ───────────────────────────────────── */
+    .final-hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .final-hero .book-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+    .final-hero h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: .75rem;
+      color: var(--ink);
+    }
+    .final-hero .final-name {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+    .final-hero p {
+      color: var(--ink-mid);
+      max-width: 460px;
+      margin: 0 auto 1.75rem;
+      line-height: 1.75;
+      font-size: .97rem;
+    }
+
+    /* ── Divider ornament ───────────────────────────────── */
+    .ornament-divider {
+      text-align: center;
+      color: var(--amber-light);
+      letter-spacing: .3em;
+      font-size: .85rem;
+      margin: 1.5rem 0;
+      opacity: .6;
     }
 
     @media (max-width: 520px) {
-      .card { padding: 1.4rem; }
+      .card { padding: 1.5rem; }
       .btn-row { flex-direction: column; }
       .btn { justify-content: center; }
     }
@@ -367,7 +473,7 @@
 <body>
 <div id="app">
   <header>
-    <span class="ornament">✦ ✦ ✦</span>
+    <span class="ornament">✦  ✦  ✦</span>
     <h1 id="main-title">Agente Biográfico</h1>
     <p class="subtitle" id="main-subtitle">Conte a sua história. Preserve para sempre.</p>
   </header>
@@ -385,40 +491,87 @@ const LANGS = {
       appTitle: 'Agente Biográfico',
       appSubtitle: 'Conte a sua história. Preserve para sempre.',
       step0Title: 'Bem-vindo',
-      step0Intro: 'Este agente vai guiá-lo por perguntas sobre sua vida e gerar um livro autobiográfico em formato Word (DOCX) ao final.',
-      apiKeyLabel: 'Chave de API Claude',
+      step0Intro: 'Este agente vai guiá-lo por perguntas sobre sua vida e gerar um livro de memórias em formato Word (DOCX) ao final.',
+      providerLabel: 'Provedor de IA',
+      apiKeyLabel: 'Chave de API',
       apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'A chave é usada diretamente no navegador e nunca é armazenada.',
       authorNameLabel: 'Seu nome completo',
       authorNamePlaceholder: 'Como você quer ser identificado no livro',
       startBtn: 'Começar minha história →',
       nextBtn: 'Continuar →',
-      skipBtn: 'Pular esta pergunta',
+      skipBtn: 'Pular',
       finishBtn: 'Gerar meu livro',
       downloadBtn: '⬇ Baixar DOCX',
+      backupBtn: '⬇ Salvar respostas (JSON)',
       restartBtn: 'Nova história',
       generating: 'Gerando...',
       thinking: 'Pensando...',
-      followupLabel: 'CLAUDE PERGUNTA',
+      aiAsksLabel: 'A IA PERGUNTA',
       yourAnswerLabel: 'SUA RESPOSTA',
       chaptersProgress: 'Capítulos concluídos',
-      finalTitle: 'Seu livro está pronto!',
-      finalMessage: 'Sua história foi preservada. O arquivo DOCX está pronto para download — você pode editá-lo, imprimir ou compartilhar com sua família.',
-      errorApiKey: 'Por favor, insira sua chave de API Claude.',
+      finalTitle: 'Seu livro está pronto.',
+      finalMessage: 'Cada palavra aqui é parte de quem você é. O arquivo DOCX está pronto — você pode editá-lo, imprimir e entregar para quem você ama.',
+      errorApiKey: 'Por favor, insira sua chave de API.',
       errorName: 'Por favor, insira seu nome.',
       errorApi: 'Erro na API: ',
+      errorNoAnswers: 'Nenhuma resposta ainda.',
       progressLabel: 'Capítulo',
       of: 'de',
+      backupFound: 'Sessão salva encontrada',
+      backupRestore: 'Restaurar',
+      coverTitle: 'Capa do livro',
+      coverNone: 'Sem capa',
+      coverGenerate: '🎨 Gerar capa com IA',
+      coverRegenerate: '🔄 Regenerar',
+      coverUpload: '📁 Usar minha foto',
+      coverGenerating: 'Gerando capa…',
+      coverError: 'Não foi possível gerar a capa. Tente novamente ou use sua própria foto.',
+      photoLabel: '📷 Adicionar fotos a este capítulo (opcional)',
+      photoHint: 'Clique ou arraste imagens aqui — serão aplicadas em sépia no livro',
+      genLoadingIcon: '✍️',
+      genPhrase: 'Transformando memórias em palavras…',
     },
     chapters: [
-      { title: 'Quem sou eu',         questions: ['Onde você nasceu e em que ano? Como era o lugar onde cresceu?', 'Como você descreveria sua origem — sua família, sua cidade, o ambiente em que cresceu?'] },
-      { title: 'Infância e família',   questions: ['Conte sobre sua infância. Como era sua casa? Quem eram as pessoas mais próximas de você?', 'Qual memória da infância você mais carrega no coração? Por quê ela é especial?'] },
-      { title: 'Escola e juventude',   questions: ['Como foram seus anos de escola? Havia algo que você adorava aprender ou fazer?', 'Quem foram os professores ou amigos que marcaram sua juventude?'] },
-      { title: 'Trabalho e carreira',  questions: ['Como começou sua vida profissional? Qual foi seu primeiro trabalho?', 'Qual conquista profissional você considera mais significativa? O que ela representou para você?'] },
-      { title: 'Amor e relacionamentos', questions: ['Conte sobre as pessoas que você amou — família, parceiro(a), amigos próximos.', 'Qual relacionamento moldou quem você é hoje? De que forma?'] },
-      { title: 'Momentos que me formaram', questions: ['Houve um momento — uma perda, uma virada, uma surpresa — que mudou o rumo da sua vida?', 'Se pudesse voltar e mudar algo, o que seria? E por quê não mudaria?'] },
-      { title: 'O que aprendi com a vida', questions: ['O que a vida lhe ensinou que nenhuma escola poderia ensinar?', 'Qual é sua maior crença sobre como se deve viver?'] },
-      { title: 'Mensagem para as próximas gerações', questions: ['O que você diria para seus filhos, netos ou qualquer pessoa jovem que ler este livro?', 'Como você gostaria de ser lembrado?'] },
+      { title: 'De onde eu vim',
+        questions: [
+          'Feche os olhos e pense na casa onde você cresceu. O que você vê, ouve ou sente quando está lá?',
+          'Quem era a pessoa que mais te definiu nessa fase da vida — e o que ela te passou sem precisar dizer com palavras?'
+        ]},
+      { title: 'Infância: o que ficou',
+        questions: [
+          'Qual é a memória da infância que você nunca esqueceu — aquela que aparece sem avisar?',
+          'O que você tinha na infância que as crianças de hoje dificilmente vão ter?'
+        ]},
+      { title: 'Quem eu era aos 20',
+        questions: [
+          'Como era você aos 18, 20 anos — o que você queria, o que você temia, quem você achava que ia ser?',
+          'Qual foi a primeira grande escolha que você fez por conta própria — e o que você sacrificou por ela?'
+        ]},
+      { title: 'O que eu construí',
+        questions: [
+          'Quando você olha para tudo que trabalhou na vida, o que você vê que vai além do salário ou do cargo?',
+          'Houve um dia, uma entrega, um projeto — em que você pensou "foi para isso que eu vim". O que foi?'
+        ]},
+      { title: 'Quem eu amei',
+        questions: [
+          'Há uma pessoa — além dos seus pais — que mudou quem você é de forma permanente. Quem é ela e o que ela fez?',
+          'O amor te ensinou algo que você não esperava aprender. O que foi?'
+        ]},
+      { title: 'O que me quebrou e me fez',
+        questions: [
+          'Houve um momento em que tudo parecia desmoronar — uma perda, uma traição, uma falha. O que foi e como você atravessou?',
+          'Olhando para trás, qual erro ou fracasso você é secretamente grato por ter vivido?'
+        ]},
+      { title: 'O que acredito',
+        questions: [
+          'Qual é a coisa mais importante que você aprendeu sobre como tratar as pessoas?',
+          'Se você pudesse colocar numa frase o que guiou sua vida — não o que você pregou, mas o que você realmente viveu — qual seria?'
+        ]},
+      { title: 'O que deixo',
+        questions: [
+          'O que você quer que as pessoas que te amam lembrem de você — não pelo que você fez, mas por quem você foi?',
+          'Tem algo que você nunca disse — para alguém, ou para si mesmo — que quer deixar escrito aqui?'
+        ]},
     ],
   },
 
@@ -428,40 +581,87 @@ const LANGS = {
       appTitle: 'Biographical Agent',
       appSubtitle: 'Tell your story. Preserve it forever.',
       step0Title: 'Welcome',
-      step0Intro: 'This agent will guide you through questions about your life and generate an autobiographical book in Word (DOCX) format at the end.',
-      apiKeyLabel: 'Claude API Key',
+      step0Intro: 'This agent will guide you through questions about your life and generate a memoir in Word (DOCX) format at the end.',
+      providerLabel: 'AI Provider',
+      apiKeyLabel: 'API Key',
       apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'Your key is used directly in the browser and is never stored.',
       authorNameLabel: 'Your full name',
       authorNamePlaceholder: 'As you want to appear in the book',
       startBtn: 'Begin my story →',
       nextBtn: 'Continue →',
-      skipBtn: 'Skip this question',
+      skipBtn: 'Skip',
       finishBtn: 'Generate my book',
       downloadBtn: '⬇ Download DOCX',
+      backupBtn: '⬇ Save answers (JSON)',
       restartBtn: 'New story',
       generating: 'Generating...',
       thinking: 'Thinking...',
-      followupLabel: 'CLAUDE ASKS',
+      aiAsksLabel: 'AI ASKS',
       yourAnswerLabel: 'YOUR ANSWER',
       chaptersProgress: 'Chapters completed',
-      finalTitle: 'Your book is ready!',
-      finalMessage: 'Your story has been preserved. The DOCX file is ready to download — you can edit it, print it, or share it with your family.',
-      errorApiKey: 'Please enter your Claude API key.',
+      finalTitle: 'Your book is ready.',
+      finalMessage: 'Every word here is a part of who you are. The DOCX file is ready — edit it, print it, and give it to the people you love.',
+      errorApiKey: 'Please enter your API key.',
       errorName: 'Please enter your name.',
       errorApi: 'API error: ',
+      errorNoAnswers: 'No answers yet.',
       progressLabel: 'Chapter',
       of: 'of',
+      backupFound: 'Saved session found',
+      backupRestore: 'Restore',
+      coverTitle: 'Book cover',
+      coverNone: 'No cover yet',
+      coverGenerate: '🎨 Generate cover with AI',
+      coverRegenerate: '🔄 Regenerate',
+      coverUpload: '📁 Use my own photo',
+      coverGenerating: 'Generating cover…',
+      coverError: 'Could not generate cover. Try again or upload your own photo.',
+      photoLabel: '📷 Add photos to this chapter (optional)',
+      photoHint: 'Click or drag images here — they will appear in sepia in the book',
+      genLoadingIcon: '✍️',
+      genPhrase: 'Turning memories into words…',
     },
     chapters: [
-      { title: 'Who I am',             questions: ['Where were you born and in what year? What was the place like where you grew up?', 'How would you describe your origins — your family, your town, the environment you grew up in?'] },
-      { title: 'Childhood & family',   questions: ['Tell me about your childhood. What was your home like? Who were the people closest to you?', 'What childhood memory do you carry most in your heart? Why is it special?'] },
-      { title: 'School & youth',       questions: ['What were your school years like? Was there something you loved to learn or do?', 'Who were the teachers or friends who shaped your youth?'] },
-      { title: 'Work & career',        questions: ['How did your professional life begin? What was your first job?', 'What professional achievement do you consider most significant? What did it mean to you?'] },
-      { title: 'Love & relationships', questions: ['Tell me about the people you have loved — family, partner, close friends.', 'Which relationship shaped who you are today? In what way?'] },
-      { title: 'Moments that shaped me', questions: ['Was there a moment — a loss, a turning point, a surprise — that changed the course of your life?', 'If you could go back and change something, what would it be? And why wouldn\'t you change it?'] },
-      { title: 'What life taught me',  questions: ['What has life taught you that no school ever could?', 'What is your deepest belief about how one should live?'] },
-      { title: 'Message to future generations', questions: ['What would you say to your children, grandchildren, or any young person who reads this book?', 'How would you like to be remembered?'] },
+      { title: 'Where I came from',
+        questions: [
+          'Close your eyes and think of the house where you grew up. What do you see, hear, or feel when you are there?',
+          'Who was the person who defined you most during that time — and what did they pass on to you without needing words?'
+        ]},
+      { title: 'Childhood: what stayed',
+        questions: [
+          'What is the childhood memory you have never forgotten — the one that comes back without warning?',
+          'What did you have in childhood that children today will rarely have?'
+        ]},
+      { title: 'Who I was at 20',
+        questions: [
+          'What were you like at 18, 20 years old — what did you want, what did you fear, who did you think you would become?',
+          'What was the first major choice you made on your own — and what did you sacrifice for it?'
+        ]},
+      { title: 'What I built',
+        questions: [
+          'When you look at everything you have worked for in life, what do you see that goes beyond salary or title?',
+          'Was there a day, a project, a moment — when you thought "this is what I came here for." What was it?'
+        ]},
+      { title: 'Who I loved',
+        questions: [
+          'There is one person — beyond your parents — who permanently changed who you are. Who are they and what did they do?',
+          'Love taught you something you did not expect to learn. What was it?'
+        ]},
+      { title: 'What broke me and made me',
+        questions: [
+          'There was a moment when everything seemed to be falling apart — a loss, a betrayal, a failure. What was it and how did you get through it?',
+          'Looking back, which mistake or failure are you secretly grateful you lived through?'
+        ]},
+      { title: 'What I believe',
+        questions: [
+          'What is the most important thing you have learned about how to treat people?',
+          'If you could put into one sentence what truly guided your life — not what you preached, but what you actually lived — what would it be?'
+        ]},
+      { title: 'What I leave behind',
+        questions: [
+          'What do you want the people who love you to remember about you — not for what you did, but for who you were?',
+          'Is there something you never said — to someone, or to yourself — that you want to leave written here?'
+        ]},
     ],
   },
 
@@ -471,40 +671,87 @@ const LANGS = {
       appTitle: 'Biographischer Agent',
       appSubtitle: 'Erzählen Sie Ihre Geschichte. Bewahren Sie sie für immer.',
       step0Title: 'Willkommen',
-      step0Intro: 'Dieser Agent führt Sie durch Fragen über Ihr Leben und erstellt am Ende ein autobiografisches Buch im Word-Format (DOCX).',
-      apiKeyLabel: 'Claude API-Schlüssel',
+      step0Intro: 'Dieser Agent führt Sie durch Fragen über Ihr Leben und erstellt am Ende ein Erinnerungsbuch im Word-Format (DOCX).',
+      providerLabel: 'KI-Anbieter',
+      apiKeyLabel: 'API-Schlüssel',
       apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'Ihr Schlüssel wird direkt im Browser verwendet und nie gespeichert.',
       authorNameLabel: 'Ihr vollständiger Name',
       authorNamePlaceholder: 'Wie Sie im Buch erscheinen möchten',
       startBtn: 'Meine Geschichte beginnen →',
       nextBtn: 'Weiter →',
-      skipBtn: 'Diese Frage überspringen',
+      skipBtn: 'Überspringen',
       finishBtn: 'Mein Buch erstellen',
       downloadBtn: '⬇ DOCX herunterladen',
+      backupBtn: '⬇ Antworten speichern (JSON)',
       restartBtn: 'Neue Geschichte',
-      generating: 'Wird erstellt...',
-      thinking: 'Überlegt...',
-      followupLabel: 'CLAUDE FRAGT',
+      generating: 'Wird erstellt…',
+      thinking: 'Überlegt…',
+      aiAsksLabel: 'KI FRAGT',
       yourAnswerLabel: 'IHRE ANTWORT',
       chaptersProgress: 'Abgeschlossene Kapitel',
-      finalTitle: 'Ihr Buch ist fertig!',
-      finalMessage: 'Ihre Geschichte wurde bewahrt. Die DOCX-Datei ist zum Download bereit — Sie können sie bearbeiten, drucken oder mit Ihrer Familie teilen.',
-      errorApiKey: 'Bitte geben Sie Ihren Claude API-Schlüssel ein.',
+      finalTitle: 'Ihr Buch ist fertig.',
+      finalMessage: 'Jedes Wort hier ist ein Teil von Ihnen. Die DOCX-Datei ist bereit — bearbeiten Sie sie, drucken Sie sie und geben Sie sie den Menschen, die Sie lieben.',
+      errorApiKey: 'Bitte geben Sie Ihren API-Schlüssel ein.',
       errorName: 'Bitte geben Sie Ihren Namen ein.',
       errorApi: 'API-Fehler: ',
+      errorNoAnswers: 'Noch keine Antworten.',
       progressLabel: 'Kapitel',
       of: 'von',
+      backupFound: 'Gespeicherte Sitzung gefunden',
+      backupRestore: 'Wiederherstellen',
+      coverTitle: 'Buchcover',
+      coverNone: 'Noch kein Cover',
+      coverGenerate: '🎨 Cover mit KI erstellen',
+      coverRegenerate: '🔄 Neu erstellen',
+      coverUpload: '📁 Eigenes Foto verwenden',
+      coverGenerating: 'Cover wird erstellt…',
+      coverError: 'Cover konnte nicht erstellt werden. Versuchen Sie es erneut oder laden Sie Ihr eigenes Foto hoch.',
+      photoLabel: '📷 Fotos zu diesem Kapitel hinzufügen (optional)',
+      photoHint: 'Klicken oder ziehen Sie Bilder hierher — sie erscheinen im Buch in Sepia',
+      genLoadingIcon: '✍️',
+      genPhrase: 'Erinnerungen werden in Worte verwandelt…',
     },
     chapters: [
-      { title: 'Wer ich bin',           questions: ['Wo wurden Sie geboren und in welchem Jahr? Wie war der Ort, in dem Sie aufgewachsen sind?', 'Wie würden Sie Ihre Herkunft beschreiben — Ihre Familie, Ihre Stadt, Ihr Umfeld?'] },
-      { title: 'Kindheit & Familie',    questions: ['Erzählen Sie von Ihrer Kindheit. Wie war Ihr Zuhause? Wer stand Ihnen am nächsten?', 'Welche Kindheitserinnerung tragen Sie am meisten im Herzen? Warum ist sie besonders?'] },
-      { title: 'Schule & Jugend',       questions: ['Wie waren Ihre Schuljahre? Gab es etwas, das Sie besonders liebten zu lernen oder zu tun?', 'Wer waren die Lehrer oder Freunde, die Ihre Jugend prägten?'] },
-      { title: 'Arbeit & Karriere',     questions: ['Wie begann Ihr Berufsleben? Was war Ihre erste Stelle?', 'Welche berufliche Leistung halten Sie für die bedeutendste? Was bedeutete sie Ihnen?'] },
-      { title: 'Liebe & Beziehungen',   questions: ['Erzählen Sie von den Menschen, die Sie geliebt haben — Familie, Partner, enge Freunde.', 'Welche Beziehung hat Ihren heutigen Charakter geformt? Auf welche Weise?'] },
-      { title: 'Prägende Momente',      questions: ['Gab es einen Moment — einen Verlust, eine Wende, eine Überraschung — der den Lauf Ihres Lebens verändert hat?', 'Wenn Sie etwas hätten ändern können, was wäre das? Und warum doch nicht?'] },
-      { title: 'Was das Leben mich lehrte', questions: ['Was hat das Leben Sie gelehrt, das keine Schule hätte lehren können?', 'Was ist Ihre tiefste Überzeugung darüber, wie man leben sollte?'] },
-      { title: 'Botschaft an künftige Generationen', questions: ['Was würden Sie Ihren Kindern, Enkeln oder einem jungen Menschen sagen, der dieses Buch liest?', 'Wie möchten Sie in Erinnerung bleiben?'] },
+      { title: 'Woher ich komme',
+        questions: [
+          'Schließen Sie die Augen und denken Sie an das Haus, in dem Sie aufgewachsen sind. Was sehen, hören oder fühlen Sie, wenn Sie dort sind?',
+          'Wer war die Person, die Sie in dieser Phase am meisten geprägt hat — und was hat sie Ihnen vermittelt, ohne es in Worte zu fassen?'
+        ]},
+      { title: 'Kindheit: was geblieben ist',
+        questions: [
+          'Welche Kindheitserinnerung haben Sie nie vergessen — die eine, die ungefragt zurückkommt?',
+          'Was hatten Sie in der Kindheit, das Kinder heute kaum noch haben werden?'
+        ]},
+      { title: 'Wer ich mit 20 war',
+        questions: [
+          'Wie waren Sie mit 18, 20 Jahren — was wollten Sie, was fürchteten Sie, wer glaubten Sie zu werden?',
+          'Was war die erste große Entscheidung, die Sie allein getroffen haben — und was haben Sie dafür geopfert?'
+        ]},
+      { title: 'Was ich aufgebaut habe',
+        questions: [
+          'Wenn Sie auf alles blicken, wofür Sie in Ihrem Leben gearbeitet haben — was sehen Sie, das über Gehalt oder Titel hinausgeht?',
+          'Gab es einen Tag, ein Projekt, einen Moment — wo Sie dachten: „Dafür bin ich hier." Was war das?'
+        ]},
+      { title: 'Wen ich geliebt habe',
+        questions: [
+          'Es gibt eine Person — außer Ihren Eltern — die dauerhaft verändert hat, wer Sie sind. Wer ist das und was hat sie getan?',
+          'Die Liebe hat Ihnen etwas beigebracht, das Sie nicht erwartet hätten. Was war das?'
+        ]},
+      { title: 'Was mich gebrochen und gemacht hat',
+        questions: [
+          'Es gab einen Moment, in dem alles auseinanderzufallen schien — ein Verlust, ein Verrat, ein Scheitern. Was war das und wie haben Sie es überstanden?',
+          'Welchen Fehler oder welches Scheitern sind Sie im Nachhinein heimlich dankbar erlebt zu haben?'
+        ]},
+      { title: 'Was ich glaube',
+        questions: [
+          'Was ist das Wichtigste, das Sie darüber gelernt haben, wie man mit Menschen umgeht?',
+          'Wenn Sie in einem Satz ausdrücken könnten, was Ihr Leben wirklich geleitet hat — nicht was Sie gepredigt, sondern was Sie wirklich gelebt haben — was wäre das?'
+        ]},
+      { title: 'Was ich hinterlasse',
+        questions: [
+          'Was sollen die Menschen, die Sie lieben, über Sie in Erinnerung behalten — nicht für das, was Sie getan haben, sondern für das, wer Sie waren?',
+          'Gibt es etwas, das Sie nie gesagt haben — zu jemandem oder zu sich selbst — das Sie hier schriftlich hinterlassen möchten?'
+        ]},
     ],
   },
 
@@ -514,40 +761,87 @@ const LANGS = {
       appTitle: 'Agente Biográfico',
       appSubtitle: 'Cuenta tu historia. Consérvala para siempre.',
       step0Title: 'Bienvenido',
-      step0Intro: 'Este agente te guiará a través de preguntas sobre tu vida y generará un libro autobiográfico en formato Word (DOCX) al final.',
-      apiKeyLabel: 'Clave de API de Claude',
+      step0Intro: 'Este agente te guiará a través de preguntas sobre tu vida y generará un libro de memorias en formato Word (DOCX) al final.',
+      providerLabel: 'Proveedor de IA',
+      apiKeyLabel: 'Clave de API',
       apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'Tu clave se usa directamente en el navegador y nunca se almacena.',
       authorNameLabel: 'Tu nombre completo',
       authorNamePlaceholder: 'Como quieres aparecer en el libro',
       startBtn: 'Comenzar mi historia →',
       nextBtn: 'Continuar →',
-      skipBtn: 'Omitir esta pregunta',
+      skipBtn: 'Omitir',
       finishBtn: 'Generar mi libro',
       downloadBtn: '⬇ Descargar DOCX',
+      backupBtn: '⬇ Guardar respuestas (JSON)',
       restartBtn: 'Nueva historia',
-      generating: 'Generando...',
-      thinking: 'Pensando...',
-      followupLabel: 'CLAUDE PREGUNTA',
+      generating: 'Generando…',
+      thinking: 'Pensando…',
+      aiAsksLabel: 'LA IA PREGUNTA',
       yourAnswerLabel: 'TU RESPUESTA',
       chaptersProgress: 'Capítulos completados',
-      finalTitle: '¡Tu libro está listo!',
-      finalMessage: 'Tu historia ha sido preservada. El archivo DOCX está listo para descargar — puedes editarlo, imprimirlo o compartirlo con tu familia.',
-      errorApiKey: 'Por favor, ingresa tu clave de API de Claude.',
-      errorName: 'Por favor, ingresa tu nombre.',
+      finalTitle: 'Tu libro está listo.',
+      finalMessage: 'Cada palabra aquí es parte de quien eres. El archivo DOCX está listo — edítalo, imprímelo y entrégalo a las personas que amas.',
+      errorApiKey: 'Por favor ingresa tu clave de API.',
+      errorName: 'Por favor ingresa tu nombre.',
       errorApi: 'Error de API: ',
+      errorNoAnswers: 'Aún no hay respuestas.',
       progressLabel: 'Capítulo',
       of: 'de',
+      backupFound: 'Sesión guardada encontrada',
+      backupRestore: 'Restaurar',
+      coverTitle: 'Portada del libro',
+      coverNone: 'Sin portada',
+      coverGenerate: '🎨 Generar portada con IA',
+      coverRegenerate: '🔄 Regenerar',
+      coverUpload: '📁 Usar mi propia foto',
+      coverGenerating: 'Generando portada…',
+      coverError: 'No se pudo generar la portada. Intenta de nuevo o usa tu propia foto.',
+      photoLabel: '📷 Agregar fotos a este capítulo (opcional)',
+      photoHint: 'Haz clic o arrastra imágenes aquí — aparecerán en sepia en el libro',
+      genLoadingIcon: '✍️',
+      genPhrase: 'Convirtiendo recuerdos en palabras…',
     },
     chapters: [
-      { title: 'Quién soy',            questions: ['¿Dónde naciste y en qué año? ¿Cómo era el lugar donde creciste?', '¿Cómo describirías tus orígenes — tu familia, tu ciudad, el ambiente en que creciste?'] },
-      { title: 'Infancia y familia',   questions: ['Cuéntame sobre tu infancia. ¿Cómo era tu hogar? ¿Quiénes eran las personas más cercanas a ti?', '¿Qué recuerdo de la infancia llevas más en el corazón? ¿Por qué es especial?'] },
-      { title: 'Escuela y juventud',   questions: ['¿Cómo fueron tus años de escuela? ¿Había algo que amabas aprender o hacer?', '¿Quiénes fueron los profesores o amigos que marcaron tu juventud?'] },
-      { title: 'Trabajo y carrera',    questions: ['¿Cómo empezó tu vida profesional? ¿Cuál fue tu primer trabajo?', '¿Qué logro profesional consideras más significativo? ¿Qué representó para ti?'] },
-      { title: 'Amor y relaciones',    questions: ['Cuéntame sobre las personas que has amado — familia, pareja, amigos cercanos.', '¿Qué relación moldeó quien eres hoy? ¿De qué manera?'] },
-      { title: 'Momentos que me formaron', questions: ['¿Hubo un momento — una pérdida, un giro, una sorpresa — que cambió el rumbo de tu vida?', 'Si pudieras volver y cambiar algo, ¿qué sería? ¿Y por qué no lo cambiarías?'] },
-      { title: 'Lo que la vida me enseñó', questions: ['¿Qué te ha enseñado la vida que ninguna escuela podría enseñarte?', '¿Cuál es tu creencia más profunda sobre cómo se debe vivir?'] },
-      { title: 'Mensaje a las próximas generaciones', questions: ['¿Qué le dirías a tus hijos, nietos o cualquier persona joven que lea este libro?', '¿Cómo te gustaría ser recordado?'] },
+      { title: 'De dónde vengo',
+        questions: [
+          'Cierra los ojos y piensa en la casa donde creciste. ¿Qué ves, escuchas o sientes cuando estás allí?',
+          '¿Quién fue la persona que más te definió en esa etapa — y qué te transmitió sin necesitar palabras?'
+        ]},
+      { title: 'Infancia: lo que quedó',
+        questions: [
+          '¿Cuál es el recuerdo de la infancia que nunca has olvidado — ese que regresa sin avisar?',
+          '¿Qué tenías en la infancia que los niños de hoy difícilmente tendrán?'
+        ]},
+      { title: 'Quién era yo a los 20',
+        questions: [
+          '¿Cómo eras a los 18, 20 años — qué querías, qué temías, quién creías que ibas a ser?',
+          '¿Cuál fue la primera gran decisión que tomaste por tu cuenta — y qué sacrificaste por ella?'
+        ]},
+      { title: 'Lo que construí',
+        questions: [
+          'Cuando miras todo lo que has trabajado en la vida, ¿qué ves que va más allá del salario o del cargo?',
+          '¿Hubo un día, un proyecto, un momento — en que pensaste "para esto vine". ¿Qué fue?'
+        ]},
+      { title: 'A quién amé',
+        questions: [
+          'Hay una persona — más allá de tus padres — que cambió permanentemente quién eres. ¿Quién es y qué hizo?',
+          'El amor te enseñó algo que no esperabas aprender. ¿Qué fue?'
+        ]},
+      { title: 'Lo que me rompió y me hizo',
+        questions: [
+          'Hubo un momento en que todo parecía derrumbarse — una pérdida, una traición, un fracaso. ¿Qué fue y cómo lo atravesaste?',
+          'Mirando atrás, ¿de qué error o fracaso estás secretamente agradecido de haber vivido?'
+        ]},
+      { title: 'Lo que creo',
+        questions: [
+          '¿Cuál es la cosa más importante que has aprendido sobre cómo tratar a las personas?',
+          'Si pudieras poner en una frase lo que guió tu vida — no lo que predicaste, sino lo que realmente viviste — ¿cuál sería?'
+        ]},
+      { title: 'Lo que dejo',
+        questions: [
+          '¿Qué quieres que las personas que te aman recuerden de ti — no por lo que hiciste, sino por quién fuiste?',
+          '¿Hay algo que nunca dijiste — a alguien, o a ti mismo — que quieres dejar escrito aquí?'
+        ]},
     ],
   },
 
@@ -557,40 +851,87 @@ const LANGS = {
       appTitle: 'Agent Biographique',
       appSubtitle: 'Racontez votre histoire. Préservez-la pour toujours.',
       step0Title: 'Bienvenue',
-      step0Intro: 'Cet agent vous guidera à travers des questions sur votre vie et générera un livre autobiographique au format Word (DOCX) à la fin.',
-      apiKeyLabel: 'Clé API Claude',
+      step0Intro: 'Cet agent vous guidera à travers des questions sur votre vie et générera un livre de mémoires au format Word (DOCX) à la fin.',
+      providerLabel: 'Fournisseur IA',
+      apiKeyLabel: 'Clé API',
       apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'Votre clé est utilisée directement dans le navigateur et n\'est jamais stockée.',
       authorNameLabel: 'Votre nom complet',
       authorNamePlaceholder: 'Tel que vous voulez apparaître dans le livre',
       startBtn: 'Commencer mon histoire →',
       nextBtn: 'Continuer →',
-      skipBtn: 'Passer cette question',
+      skipBtn: 'Passer',
       finishBtn: 'Générer mon livre',
       downloadBtn: '⬇ Télécharger DOCX',
+      backupBtn: '⬇ Sauvegarder les réponses (JSON)',
       restartBtn: 'Nouvelle histoire',
-      generating: 'Génération...',
-      thinking: 'Réflexion...',
-      followupLabel: 'CLAUDE DEMANDE',
+      generating: 'Génération…',
+      thinking: 'Réflexion…',
+      aiAsksLabel: "L'IA DEMANDE",
       yourAnswerLabel: 'VOTRE RÉPONSE',
       chaptersProgress: 'Chapitres terminés',
-      finalTitle: 'Votre livre est prêt !',
-      finalMessage: 'Votre histoire a été préservée. Le fichier DOCX est prêt à télécharger — vous pouvez le modifier, l\'imprimer ou le partager avec votre famille.',
-      errorApiKey: 'Veuillez entrer votre clé API Claude.',
+      finalTitle: 'Votre livre est prêt.',
+      finalMessage: "Chaque mot ici fait partie de qui vous êtes. Le fichier DOCX est prêt — modifiez-le, imprimez-le et offrez-le aux personnes que vous aimez.",
+      errorApiKey: 'Veuillez entrer votre clé API.',
       errorName: 'Veuillez entrer votre nom.',
       errorApi: 'Erreur API : ',
+      errorNoAnswers: 'Aucune réponse pour le moment.',
       progressLabel: 'Chapitre',
       of: 'sur',
+      backupFound: 'Session sauvegardée trouvée',
+      backupRestore: 'Restaurer',
+      coverTitle: 'Couverture du livre',
+      coverNone: 'Pas encore de couverture',
+      coverGenerate: '🎨 Générer une couverture avec IA',
+      coverRegenerate: '🔄 Régénérer',
+      coverUpload: '📁 Utiliser ma propre photo',
+      coverGenerating: 'Génération de la couverture…',
+      coverError: 'Impossible de générer la couverture. Réessayez ou utilisez votre propre photo.',
+      photoLabel: '📷 Ajouter des photos à ce chapitre (optionnel)',
+      photoHint: 'Cliquez ou déposez des images ici — elles apparaîtront en sépia dans le livre',
+      genLoadingIcon: '✍️',
+      genPhrase: 'Les souvenirs se transforment en mots…',
     },
     chapters: [
-      { title: 'Qui je suis',          questions: ['Où êtes-vous né(e) et en quelle année ? Comment était l’endroit où vous avez grandi ?', 'Comment décririez-vous vos origines — votre famille, votre ville, votre environnement ?'] },
-      { title: 'Enfance & famille',    questions: ['Parlez-moi de votre enfance. À quoi ressemblait votre maison ? Qui étaient les personnes les plus proches de vous ?', 'Quel souvenir d\'enfance portez-vous le plus dans votre cœur ? Pourquoi est-il spécial ?'] },
-      { title: 'École & jeunesse',     questions: ['Comment se sont passées vos années scolaires ? Y avait-il quelque chose que vous adoriez apprendre ou faire ?', 'Qui étaient les professeurs ou amis qui ont marqué votre jeunesse ?'] },
-      { title: 'Travail & carrière',   questions: ['Comment a débuté votre vie professionnelle ? Quel a été votre premier emploi ?', 'Quelle réussite professionnelle considérez-vous la plus significative ? Que représentait-elle pour vous ?'] },
-      { title: 'Amour & relations',    questions: ['Parlez-moi des personnes que vous avez aimées — famille, partenaire, amis proches.', 'Quelle relation a façonné la personne que vous êtes aujourd\'hui ? De quelle manière ?'] },
-      { title: 'Moments fondateurs',   questions: ['Y a-t-il eu un moment — une perte, un tournant, une surprise — qui a changé le cours de votre vie ?', 'Si vous pouviez revenir en arrière et changer quelque chose, que serait-ce ? Et pourquoi finalement non ?'] },
-      { title: 'Ce que la vie m\'a appris', questions: ['Qu\'est-ce que la vie vous a appris qu\'aucune école n\'aurait pu enseigner ?', 'Quelle est votre conviction la plus profonde sur la façon de vivre ?'] },
-      { title: 'Message aux générations futures', questions: ['Que diriez-vous à vos enfants, petits-enfants ou à tout jeune qui lirait ce livre ?', 'Comment aimeriez-vous être rappelé(e) ?'] },
+      { title: "D'où je viens",
+        questions: [
+          "Fermez les yeux et pensez à la maison où vous avez grandi. Que voyez-vous, entendez-vous ou ressentez-vous quand vous y êtes ?",
+          "Qui était la personne qui vous a le plus défini(e) à cette époque — et qu'est-ce qu'elle vous a transmis sans avoir besoin de mots ?"
+        ]},
+      { title: "Enfance : ce qui est resté",
+        questions: [
+          "Quel est le souvenir d'enfance que vous n'avez jamais oublié — celui qui revient sans prévenir ?",
+          "Qu'aviez-vous dans l'enfance que les enfants d'aujourd'hui auront rarement ?"
+        ]},
+      { title: "Qui j'étais à 20 ans",
+        questions: [
+          "Comment étiez-vous à 18, 20 ans — que vouliez-vous, que craigniez-vous, qui pensiez-vous devenir ?",
+          "Quel a été le premier grand choix que vous avez fait seul(e) — et à quoi avez-vous renoncé pour lui ?"
+        ]},
+      { title: "Ce que j'ai construit",
+        questions: [
+          "Quand vous regardez tout ce pour quoi vous avez travaillé dans la vie, que voyez-vous qui va au-delà du salaire ou du titre ?",
+          "Y a-t-il eu un jour, un projet, un moment — où vous avez pensé « c'est pour ça que je suis là ». Qu'est-ce que c'était ?"
+        ]},
+      { title: "Qui j'ai aimé",
+        questions: [
+          "Il y a une personne — au-delà de vos parents — qui a changé de façon permanente qui vous êtes. Qui est-elle et qu'a-t-elle fait ?",
+          "L'amour vous a appris quelque chose que vous n'attendiez pas. Qu'est-ce que c'était ?"
+        ]},
+      { title: "Ce qui m'a brisé et fait",
+        questions: [
+          "Il y a eu un moment où tout semblait s'effondrer — une perte, une trahison, un échec. Qu'est-ce que c'était et comment l'avez-vous traversé ?",
+          "En regardant en arrière, de quelle erreur ou de quel échec êtes-vous secrètement reconnaissant(e) de l'avoir vécu ?"
+        ]},
+      { title: "Ce que je crois",
+        questions: [
+          "Quelle est la chose la plus importante que vous avez apprise sur la façon de traiter les gens ?",
+          "Si vous pouviez résumer en une phrase ce qui a vraiment guidé votre vie — non pas ce que vous avez prêché, mais ce que vous avez vraiment vécu — quelle serait-elle ?"
+        ]},
+      { title: "Ce que je laisse",
+        questions: [
+          "Que voulez-vous que les personnes qui vous aiment se rappellent de vous — non pas pour ce que vous avez fait, mais pour qui vous étiez ?",
+          "Y a-t-il quelque chose que vous n'avez jamais dit — à quelqu'un, ou à vous-même — que vous voulez laisser écrit ici ?"
+        ]},
     ],
   },
 };
@@ -612,20 +953,18 @@ const state = {
   chapterIdx: 0,
   questionIdx: 0,
   answers: [],
-  photos: {},          // { chapterIdx: [base64png, ...] }
-  coverImageB64: null, // AI-generated cover (base64 png)
+  photos: {},
+  coverImageB64: null,
   pendingAnswer: '',
-  pendingFollowup: '',
   followupQuestion: null,
   awaitingFollowup: false,
   docxBlob: null,
 };
 
-// ── Provider configs ──────────────────────────────────
 const PROVIDERS = {
-  gemini: { label: 'Google Gemini (gratuito)', placeholder: 'AIza...', model: 'gemini-2.0-flash' },
-  groq:   { label: 'Groq (gratuito)',          placeholder: 'gsk_...',  model: 'llama-3.3-70b-versatile' },
-  claude: { label: 'Claude / Anthropic (pago)', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514' },
+  gemini: { label: 'Google Gemini', placeholder: 'AIza...', model: 'gemini-2.0-flash', free: true },
+  groq:   { label: 'Groq (Llama 3.3)', placeholder: 'gsk_...', model: 'llama-3.3-70b-versatile', free: true },
+  claude: { label: 'Claude / Anthropic', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514', free: false },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -636,10 +975,10 @@ const screen = () => $('screen');
 const t = () => LANGS[state.lang].ui;
 const chapters = () => LANGS[state.lang].chapters;
 
-function setProgress(current, total) {
+function setProgress(current, total, chapterName) {
   const pct = total ? Math.round((current / total) * 100) : 0;
   $('progress-fill').style.width = pct + '%';
-  $('progress-current').textContent = `${t().progressLabel} ${current} ${t().of} ${total}`;
+  $('progress-current').textContent = `${t().progressLabel} ${current} ${t().of} ${total}${chapterName ? ' — ' + chapterName : ''}`;
   $('progress-pct').textContent = pct + '%';
 }
 
@@ -652,59 +991,43 @@ function showError(msg) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  UNIFIED AI CALL
+//  AI CALLS
 // ═══════════════════════════════════════════════════════
 async function callAI(systemPrompt, userMessage, maxTokens = 600) {
   const p = state.provider;
   const key = state.apiKey;
 
-  // ── Gemini ──────────────────────────────────────────
   if (p === 'gemini') {
-    const model = PROVIDERS.gemini.model;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${PROVIDERS.gemini.model}:generateContent?key=${key}`;
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.8 },
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.85 },
       }),
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error?.message || res.statusText);
-    }
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || res.statusText); }
     const data = await res.json();
     return data.candidates[0].content.parts[0].text.trim();
   }
 
-  // ── Groq ─────────────────────────────────────────────
   if (p === 'groq') {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
       body: JSON.stringify({
         model: PROVIDERS.groq.model,
         max_tokens: maxTokens,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user',   content: userMessage },
-        ],
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
       }),
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error?.message || res.statusText);
-    }
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || res.statusText); }
     const data = await res.json();
     return data.choices[0].message.content.trim();
   }
 
-  // ── Claude ───────────────────────────────────────────
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -720,10 +1043,7 @@ async function callAI(systemPrompt, userMessage, maxTokens = 600) {
       messages: [{ role: 'user', content: userMessage }],
     }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || res.statusText);
-  }
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || res.statusText); }
   const data = await res.json();
   return data.content[0].text.trim();
 }
@@ -731,94 +1051,112 @@ async function callAI(systemPrompt, userMessage, maxTokens = 600) {
 async function getFollowupQuestion(chapterTitle, originalQuestion, answer) {
   const lang = state.lang;
   const systemMap = {
-    pt: `Você é um entrevistador empático conduzindo uma entrevista biográfica em português. 
-Com base na resposta da pessoa, faça UMA pergunta de aprofundamento calorosa e específica que explore um detalhe ou emoção que ela mencionou.
-Seja breve (máximo 2 frases). NÃO faça introduções longas. Responda APENAS com a pergunta de acompanhamento.`,
+    pt: `Você é um entrevistador empático conduzindo uma entrevista biográfica em português.
+Com base na resposta, faça UMA pergunta de aprofundamento calorosa e específica que explore um detalhe concreto ou emoção que a pessoa mencionou.
+Máximo 2 frases. Sem introduções. Responda APENAS com a pergunta.`,
     en: `You are an empathetic interviewer conducting a biographical interview in English.
-Based on the person's answer, ask ONE warm, specific follow-up question that explores a detail or emotion they mentioned.
-Be brief (max 2 sentences). NO long introductions. Respond ONLY with the follow-up question.`,
-    de: `Sie sind ein einfühlsamer Interviewer, der ein biografisches Interview auf Deutsch führt.
-Stellen Sie basierend auf der Antwort der Person EINE warme, spezifische Folgefrage, die ein Detail oder eine Emotion erkundet.
-Seien Sie kurz (maximal 2 Sätze). Antworten Sie NUR mit der Folgefrage.`,
-    es: `Eres un entrevistador empático conduciendo una entrevista biográfica en español.
-Basándote en la respuesta de la persona, haz UNA pregunta de seguimiento cálida y específica que explore un detalle o emoción que mencionó.
-Sé breve (máximo 2 oraciones). Responde SOLO con la pregunta de seguimiento.`,
-    fr: `Vous êtes un intervieweur empathique conduisant un entretien biographique en français.
-Sur la base de la réponse de la personne, posez UNE question de suivi chaleureuse et spécifique qui explore un détail ou une émotion mentionnée.
-Soyez bref (maximum 2 phrases). Répondez UNIQUEMENT avec la question de suivi.`,
+Based on the answer, ask ONE warm, specific follow-up question that explores a concrete detail or emotion the person mentioned.
+Max 2 sentences. No introductions. Respond ONLY with the question.`,
+    de: `Sie sind ein einfühlsamer Interviewer für ein biografisches Interview auf Deutsch.
+Stellen Sie EINE spezifische Folgefrage zu einem konkreten Detail oder einer Emotion aus der Antwort.
+Maximal 2 Sätze. Keine Einleitung. Antworten Sie NUR mit der Frage.`,
+    es: `Eres un entrevistador empático en una entrevista biográfica en español.
+Haz UNA pregunta de seguimiento específica sobre un detalle concreto o emoción que mencionó la persona.
+Máximo 2 oraciones. Sin introducciones. Responde SOLO con la pregunta.`,
+    fr: `Vous êtes un intervieweur empathique pour un entretien biographique en français.
+Posez UNE question de suivi spécifique sur un détail concret ou une émotion mentionnée.
+Maximum 2 phrases. Sans introduction. Répondez UNIQUEMENT avec la question.`,
   };
   const sys = systemMap[lang] || systemMap.en;
-  const user = `Capítulo/Kapitel/Chapter: ${chapterTitle}\nPergunta/Frage/Question: ${originalQuestion}\nResposta/Antwort/Answer: ${answer}`;
-  return callAI(sys, user, 600);
+  const user = `Capítulo: ${chapterTitle}\nPergunta: ${originalQuestion}\nResposta: ${answer}`;
+  return callAI(sys, user, 300);
 }
 
 async function generateNarrative(chapterTitle, qas) {
   const lang = state.lang;
   const systemMap = {
-    pt: `Você é um escritor biográfico sensível e literário escrevendo em português.
-Escreva um texto narrativo fluido para um capítulo de autobiografia baseado nas perguntas e respostas fornecidas.
-- Escreva na primeira pessoa, como se fosse a voz da própria pessoa
-- Preserve todos os detalhes factuais e emocionais das respostas
-- Use linguagem rica mas acessível, com calor humano
-- 3 a 5 parágrafos
-- NÃO inclua título de capítulo
-- NÃO use marcadores ou listas`,
-    en: `You are a sensitive, literary biographical writer writing in English.
-Write a fluid narrative text for an autobiography chapter based on the provided questions and answers.
-- Write in first person, as if it were the person's own voice
-- Preserve all factual and emotional details from the answers
-- Use rich but accessible language with warmth
-- 3 to 5 paragraphs
+    pt: `Você é um escritor de memórias — sensível, literário, sem exagero sentimental. Escreva exatamente 4 parágrafos para este capítulo de um livro de memórias de bolso.
+
+Regras obrigatórias:
+- Escreva na primeira pessoa, como a voz da própria pessoa
+- O primeiro parágrafo deve abrir com uma imagem concreta ou momento específico — nunca com uma generalização
+- Use nomes próprios, lugares e detalhes exatos que aparecem nas respostas
+- Tom: cálido, honesto, sem melodrama — como uma conversa íntima que virou prosa
+- Cada parágrafo deve ter 4 a 6 frases. Cerca de 500 palavras no total.
+- NÃO inclua o título do capítulo
+- NÃO use frases prontas ("a vida é uma jornada", "no fim das contas", "aprendi que")
+- Se a resposta for curta, aprofunde o sentimento implícito — não invente fatos`,
+
+    en: `You are a memoir writer — sensitive, literary, without sentimental excess. Write exactly 4 paragraphs for this chapter of a pocket memoir.
+
+Mandatory rules:
+- Write in first person, as the person's own voice
+- The first paragraph must open with a concrete image or specific moment — never a generalization
+- Use proper names, places and exact details from the answers
+- Tone: warm, honest, without melodrama — like an intimate conversation turned into prose
+- Each paragraph should have 4 to 6 sentences. About 500 words total.
 - Do NOT include the chapter title
-- Do NOT use bullet points or lists`,
-    de: `Sie sind ein einfühlsamer, literarischer Biografieschreiber auf Deutsch.
-Schreiben Sie einen fließenden Erzähltext für ein Autobiografiekapitel auf Basis der bereitgestellten Fragen und Antworten.
-- Schreiben Sie in der ersten Person, als ob es die Stimme der Person selbst wäre
-- Bewahren Sie alle sachlichen und emotionalen Details der Antworten
-- Verwenden Sie eine reiche, aber zugängliche Sprache mit Wärme
-- 3 bis 5 Absätze
+- Do NOT use clichés ("life is a journey", "in the end", "I learned that")
+- If an answer is short, deepen the implicit feeling — do not invent facts`,
+
+    de: `Sie sind ein Memoirenschreiber — einfühlsam, literarisch, ohne sentimentale Übertreibung. Schreiben Sie genau 4 Absätze für dieses Kapitel eines Taschenbuchs der Erinnerungen.
+
+Pflichtregeln:
+- Schreiben Sie in der ersten Person, als die Stimme der Person selbst
+- Der erste Absatz muss mit einem konkreten Bild oder spezifischen Moment beginnen — niemals mit einer Verallgemeinerung
+- Verwenden Sie Eigennamen, Orte und genaue Details aus den Antworten
+- Ton: warm, ehrlich, ohne Melodrama — wie ein intimes Gespräch, das zu Prosa wurde
+- Jeder Absatz sollte 4 bis 6 Sätze haben. Insgesamt ca. 500 Wörter.
 - Fügen Sie KEINEN Kapiteltitel ein
-- Verwenden Sie KEINE Aufzählungszeichen`,
-    es: `Eres un escritor biográfico sensible y literario escribiendo en español.
-Escribe un texto narrativo fluido para un capítulo de autobiografía basado en las preguntas y respuestas proporcionadas.
-- Escribe en primera persona, como si fuera la voz de la propia persona
-- Preserva todos los detalles factuales y emocionales de las respuestas
-- Usa un lenguaje rico pero accesible, con calidez humana
-- 3 a 5 párrafos
+- Verwenden Sie KEINE Klischees
+- Bei kurzen Antworten vertiefen Sie das implizite Gefühl — erfinden Sie keine Fakten`,
+
+    es: `Eres un escritor de memorias — sensible, literario, sin exceso sentimental. Escribe exactamente 4 párrafos para este capítulo de un libro de memorias de bolsillo.
+
+Reglas obligatorias:
+- Escribe en primera persona, como la voz de la propia persona
+- El primer párrafo debe abrir con una imagen concreta o momento específico — nunca con una generalización
+- Usa nombres propios, lugares y detalles exactos de las respuestas
+- Tono: cálido, honesto, sin melodrama — como una conversación íntima que se convirtió en prosa
+- Cada párrafo debe tener 4 a 6 oraciones. Unas 500 palabras en total.
 - NO incluyas el título del capítulo
-- NO uses viñetas o listas`,
-    fr: `Vous êtes un écrivain biographique sensible et littéraire écrivant en français.
-Rédigez un texte narratif fluide pour un chapitre d'autobiographie basé sur les questions et réponses fournies.
-- Écrivez à la première personne, comme si c'était la voix de la personne elle-même
-- Préservez tous les détails factuels et émotionnels des réponses
-- Utilisez un langage riche mais accessible, avec chaleur humaine
-- 3 à 5 paragraphes
+- NO uses frases hechas
+- Si una respuesta es corta, profundiza el sentimiento implícito — no inventes hechos`,
+
+    fr: `Vous êtes un écrivain de mémoires — sensible, littéraire, sans excès sentimental. Écrivez exactement 4 paragraphes pour ce chapitre d'un livre de mémoires de poche.
+
+Règles obligatoires:
+- Écrivez à la première personne, comme la voix de la personne elle-même
+- Le premier paragraphe doit s'ouvrir sur une image concrète ou un moment spécifique — jamais une généralisation
+- Utilisez des noms propres, des lieux et des détails exacts des réponses
+- Ton: chaleureux, honnête, sans mélodrame — comme une conversation intime devenue prose
+- Chaque paragraphe doit avoir 4 à 6 phrases. Environ 500 mots au total.
 - N'incluez PAS le titre du chapitre
-- N'utilisez PAS de puces ou de listes`,
+- N'utilisez PAS de clichés
+- Si une réponse est courte, approfondissez le sentiment implicite — n'inventez pas de faits`,
   };
+
   const sys = systemMap[lang] || systemMap.en;
-  let user = `Capítulo/Chapter: ${chapterTitle}\n\n`;
+  let user = `Capítulo: ${chapterTitle}\n\n`;
   for (const qa of qas) {
-    user += `P: ${qa.question}\nR: ${qa.answer}\n`;
+    user += `P: ${qa.question}\nR: ${qa.answer || '(sem resposta)'}\n`;
     if (qa.followup && qa.followupAnswer) {
-      user += `P (detalhe): ${qa.followup}\nR: ${qa.followupAnswer}\n`;
+      user += `P (aprofundamento): ${qa.followup}\nR: ${qa.followupAnswer}\n`;
     }
     user += '\n';
   }
-  return callAI(sys, user, 1000);
+  return callAI(sys, user, 1500);
 }
 
 // ═══════════════════════════════════════════════════════
 //  IMAGE PROCESSING
 // ═══════════════════════════════════════════════════════
-
 async function fileToSepiaBase64(file, maxPx = 1200) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        // Resize
         let w = img.width, h = img.height;
         if (w > maxPx || h > maxPx) {
           if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
@@ -828,7 +1166,6 @@ async function fileToSepiaBase64(file, maxPx = 1200) {
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        // Sepia filter
         const imageData = ctx.getImageData(0, 0, w, h);
         const d = imageData.data;
         for (let i = 0; i < d.length; i += 4) {
@@ -853,10 +1190,7 @@ async function composeMosaic(b64list, targetW = 1200) {
     let loaded = 0;
     for (const src of b64list) {
       const img = new Image();
-      img.onload = () => {
-        loaded++;
-        if (loaded === b64list.length) buildMosaic();
-      };
+      img.onload = () => { loaded++; if (loaded === b64list.length) buildMosaic(); };
       img.src = src;
       imgs.push(img);
     }
@@ -865,24 +1199,20 @@ async function composeMosaic(b64list, targetW = 1200) {
       const cols = n <= 2 ? n : n <= 4 ? 2 : 3;
       const rows = Math.ceil(n / cols);
       const cellW = Math.floor(targetW / cols);
-      const cellH = cellW; // square cells
+      const cellH = cellW;
       const canvas = document.createElement('canvas');
-      canvas.width  = cols * cellW;
-      canvas.height = rows * cellH;
+      canvas.width = cols * cellW; canvas.height = rows * cellH;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#F9F5EF';
+      ctx.fillStyle = '#F7F2EA';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       imgs.forEach((img, i) => {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
+        const col = i % cols, row = Math.floor(i / cols);
         const x = col * cellW + 2, y = row * cellH + 2;
-        const w = cellW - 4,       h = cellH - 4;
-        // Cover fit
+        const w = cellW - 4, h = cellH - 4;
         const scale = Math.max(w / img.width, h / img.height);
         const sw = img.width * scale, sh = img.height * scale;
-        const sx = (sw - w) / 2,     sy = (sh - h) / 2;
-        ctx.drawImage(img, -sx / scale, -sy / scale, img.width, img.height,
-                      x, y, w, h);
+        const sx = (sw - w) / 2, sy = (sh - h) / 2;
+        ctx.drawImage(img, -sx / scale, -sy / scale, img.width, img.height, x, y, w, h);
       });
       resolve(canvas.toDataURL('image/jpeg', 0.88));
     }
@@ -915,15 +1245,12 @@ function base64ToBytes(b64) {
 }
 
 // ═══════════════════════════════════════════════════════
-//  DOCX GENERATION (pure JS, no CDN dependency)
+//  DOCX GENERATION
 // ═══════════════════════════════════════════════════════
-
-// Minimal DEFLATE-raw via CompressionStream (supported in all modern browsers)
 async function deflateRaw(data) {
   const cs = new CompressionStream('deflate-raw');
   const writer = cs.writable.getWriter();
-  writer.write(data);
-  writer.close();
+  writer.write(data); writer.close();
   const chunks = [];
   const reader = cs.readable.getReader();
   while (true) {
@@ -957,63 +1284,40 @@ function u16le(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
 function u32le(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
 
 async function buildZip(files) {
-  // files: [{name, data: Uint8Array}]
   const enc = new TextEncoder();
   const entries = [];
   let offset = 0;
   const parts = [];
-
   for (const f of files) {
     const nameBytes = enc.encode(f.name);
     const compressed = await deflateRaw(f.data);
     const crc = crc32(f.data);
     const localHeader = new Uint8Array([
-      0x50,0x4B,0x03,0x04,       // sig
-      0x14,0x00,                  // version needed: 2.0
-      0x00,0x00,                  // flags
-      0x08,0x00,                  // compression: deflate
-      0x00,0x00,0x00,0x00,        // mod time/date
-      ...u32le(crc),
-      ...u32le(compressed.length),
-      ...u32le(f.data.length),
-      ...u16le(nameBytes.length),
-      0x00,0x00,                  // extra field length
-      ...nameBytes,
+      0x50,0x4B,0x03,0x04, 0x14,0x00, 0x00,0x00, 0x08,0x00,
+      0x00,0x00,0x00,0x00,
+      ...u32le(crc), ...u32le(compressed.length), ...u32le(f.data.length),
+      ...u16le(nameBytes.length), 0x00,0x00, ...nameBytes,
     ]);
     entries.push({ nameBytes, crc, compSize: compressed.length, uncompSize: f.data.length, offset });
     parts.push(localHeader, compressed);
     offset += localHeader.length + compressed.length;
   }
-
-  // Central directory
   const cdParts = [];
   for (const e of entries) {
-    const cd = new Uint8Array([
-      0x50,0x4B,0x01,0x02,
-      0x14,0x00,0x14,0x00,
-      0x00,0x00,
-      0x08,0x00,
+    cdParts.push(new Uint8Array([
+      0x50,0x4B,0x01,0x02, 0x14,0x00,0x14,0x00, 0x00,0x00, 0x08,0x00,
       0x00,0x00,0x00,0x00,
-      ...u32le(e.crc),
-      ...u32le(e.compSize),
-      ...u32le(e.uncompSize),
+      ...u32le(e.crc), ...u32le(e.compSize), ...u32le(e.uncompSize),
       ...u16le(e.nameBytes.length),
-      0x00,0x00,0x00,0x00,0x00,0x00,
-      0x00,0x00,0x00,0x00,
-      ...u32le(e.offset),
-      ...e.nameBytes,
-    ]);
-    cdParts.push(cd);
+      0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,
+      ...u32le(e.offset), ...e.nameBytes,
+    ]));
   }
   const cdData = concat(cdParts);
   const eocd = new Uint8Array([
-    0x50,0x4B,0x05,0x06,
-    0x00,0x00,0x00,0x00,
-    ...u16le(entries.length),
-    ...u16le(entries.length),
-    ...u32le(cdData.length),
-    ...u32le(offset),
-    0x00,0x00,
+    0x50,0x4B,0x05,0x06, 0x00,0x00,0x00,0x00,
+    ...u16le(entries.length), ...u16le(entries.length),
+    ...u32le(cdData.length), ...u32le(offset), 0x00,0x00,
   ]);
   return concat([...parts, cdData, eocd]);
 }
@@ -1027,54 +1331,46 @@ function concat(arrays) {
 }
 
 function xmlEsc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&apos;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
 function makeParaXml(text, opts = {}) {
-  const { bold, size = 24, color = '2B2416', center = false,
-          italic = false, pageBreak = false, spaceBefore = 0,
-          spaceAfter = 200, firstIndent = 0, heading = false } = opts;
+  const { bold, size = 24, color = '2B2416', center = false, italic = false,
+          pageBreak = false, spaceBefore = 0, spaceAfter = 200,
+          firstIndent = 0, heading = false } = opts;
   const pPr = `<w:pPr>
-      ${heading ? `<w:pStyle w:val="Heading1"/>` : ''}
-      ${center ? `<w:jc w:val="center"/>` : ''}
-      ${pageBreak ? `<w:pageBreakBefore/>` : ''}
-      <w:spacing w:before="${spaceBefore}" w:after="${spaceAfter}" w:line="360" w:lineRule="auto"/>
-      ${firstIndent ? `<w:ind w:firstLine="${firstIndent}"/>` : ''}
-    </w:pPr>`;
+    ${heading ? `<w:pStyle w:val="Heading1"/>` : ''}
+    ${center ? `<w:jc w:val="center"/>` : ''}
+    ${pageBreak ? `<w:pageBreakBefore/>` : ''}
+    <w:spacing w:before="${spaceBefore}" w:after="${spaceAfter}" w:line="380" w:lineRule="auto"/>
+    ${firstIndent ? `<w:ind w:firstLine="${firstIndent}"/>` : ''}
+  </w:pPr>`;
   const rPr = `<w:rPr>
-      <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
-      <w:sz w:val="${size}"/><w:szCs w:val="${size}"/>
-      ${bold ? `<w:b/><w:bCs/>` : ''}
-      ${italic ? `<w:i/><w:iCs/>` : ''}
-      <w:color w:val="${color}"/>
-    </w:rPr>`;
+    <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
+    <w:sz w:val="${size}"/><w:szCs w:val="${size}"/>
+    ${bold ? `<w:b/><w:bCs/>` : ''}
+    ${italic ? `<w:i/><w:iCs/>` : ''}
+    <w:color w:val="${color}"/>
+  </w:rPr>`;
   return `<w:p>${pPr}<w:r>${rPr}<w:t xml:space="preserve">${xmlEsc(text)}</w:t></w:r></w:p>`;
 }
 
 async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   const enc = new TextEncoder();
   const chapsList = chapters();
-
-  const titleMap = { pt:'Minha História de Vida', en:'My Life Story', de:'Meine Lebensgeschichte', es:'Mi Historia de Vida', fr:'Mon Histoire de Vie' };
+  const titleMap = { pt:'Minhas Memórias', en:'My Memories', de:'Meine Erinnerungen', es:'Mis Memorias', fr:'Mes Mémoires' };
   const byMap    = { pt:'por', en:'by', de:'von', es:'por', fr:'par' };
   const dateStr  = new Date().toLocaleDateString(
-    state.lang==='pt'?'pt-BR': state.lang==='de'?'de-DE': state.lang==='es'?'es-ES': state.lang==='fr'?'fr-FR':'en-US',
+    state.lang==='pt'?'pt-BR':state.lang==='de'?'de-DE':state.lang==='es'?'es-ES':state.lang==='fr'?'fr-FR':'en-US',
     { year:'numeric', month:'long' }
   );
-
   const bookTitle = titleMap[state.lang] || titleMap.en;
-  const byWord    = byMap[state.lang]    || byMap.en;
+  const byWord    = byMap[state.lang] || byMap.en;
 
-  // ── Build document.xml ────────────────────────────────
   let body = '';
-  const imageFiles = []; // {name, data} pairs for zip
+  const imageFiles = [];
   let imgCounter = 1;
-  const imgRels = []; // {rId, name}
+  const imgRels = [];
 
   function makeImageXml(rId, widthEmu, heightEmu) {
     return `<w:p><w:pPr><w:jc w:val="center"/><w:spacing w:before="240" w:after="240"/></w:pPr>
@@ -1100,51 +1396,39 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
 
   // Title page
   body += makeParaXml('', { spaceAfter: 0, spaceBefore: coverB64 ? 480 : 2880 });
-
-  // Cover image if available
   if (coverB64) {
     const coverBytes = base64ToBytes(coverB64);
     const coverName  = `image${imgCounter}.jpeg`;
     imageFiles.push({ name: `word/media/${coverName}`, data: coverBytes });
     const rId = imgCounter; imgCounter++;
     imgRels.push({ rId: rId + 10, name: coverName });
-    // ~12cm wide, proportional height (800x1100 ratio)
     body += makeImageXml(rId, 4320000, 5940000);
     body += makeParaXml('', { spaceAfter: 240, spaceBefore: 0 });
   }
-
-  body += makeParaXml(bookTitle,                        { bold:true, size:52, center:true, spaceAfter:360, spaceBefore:0 });
-  body += makeParaXml(`${byWord} ${state.authorName}`,  { italic:true, size:28, color:'5C4F3A', center:true, spaceAfter:240, spaceBefore:0 });
-  body += makeParaXml(dateStr,                          { size:22, color:'9A8B73', center:true, spaceAfter:0, spaceBefore:0 });
+  body += makeParaXml(bookTitle,                       { bold:true, size:52, center:true, spaceAfter:360, spaceBefore:0 });
+  body += makeParaXml(`${byWord} ${state.authorName}`, { italic:true, size:28, color:'5C4F3A', center:true, spaceAfter:200, spaceBefore:0 });
+  body += makeParaXml(dateStr,                         { size:22, color:'9A8B73', center:true, spaceAfter:0, spaceBefore:0 });
   body += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
 
-  // Chapters
   for (let i = 0; i < narratives.length; i++) {
     const narrative = narratives[i];
     if (!narrative) continue;
     const chap = chapsList[i];
-
-    body += makeParaXml(`${i+1}. ${chap.title}`, {
-      heading: true, bold: true, size: 36, spaceBefore: 0, spaceAfter: 240,
-    });
-
+    body += makeParaXml(`${i+1}. ${chap.title}`, { heading:true, bold:true, size:36, spaceBefore:0, spaceAfter:280 });
     const paras = narrative.split(/\n+/).filter(p => p.trim());
     for (const para of paras) {
-      body += makeParaXml(para, { firstIndent: 720, spaceAfter: 200 });
+      body += makeParaXml(para, { firstIndent: 720, spaceAfter: 220, size: 24 });
     }
-
-    // Chapter photos (mosaic already composed + sepia applied)
     if (chapterImages[i] && chapterImages[i].length > 0) {
-      const mosaicB64  = await composeMosaic(chapterImages[i]);
-      const imgBytes   = base64ToBytes(mosaicB64);
-      const imgName    = `image${imgCounter}.jpeg`;
+      const mosaicB64 = await composeMosaic(chapterImages[i]);
+      const imgBytes  = base64ToBytes(mosaicB64);
+      const imgName   = `image${imgCounter}.jpeg`;
       imageFiles.push({ name: `word/media/${imgName}`, data: imgBytes });
       const rId = imgCounter; imgCounter++;
       imgRels.push({ rId: rId + 10, name: imgName });
       body += makeParaXml('', { spaceAfter: 120, spaceBefore: 240 });
-      body += makeImageXml(rId, 5760000, 5760000); // ~16cm square
+      body += makeImageXml(rId, 5760000, 5760000);
     }
-
     if (i < narratives.length - 1) {
       body += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
     }
@@ -1154,8 +1438,7 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
 <w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <w:body>
-    ${body}
+  <w:body>${body}
     <w:sectPr>
       <w:footerReference w:type="default" r:id="rId1"/>
       <w:pgSz w:w="11906" w:h="16838"/>
@@ -1164,49 +1447,35 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   </w:body>
 </w:document>`;
 
-  // ── Footer ────────────────────────────────────────────
   const footerXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:p>
     <w:pPr><w:jc w:val="center"/></w:pPr>
-    <w:r>
-      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
-      <w:t xml:space="preserve">${xmlEsc(state.authorName)}  ·  </w:t>
-    </w:r>
-    <w:r>
-      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
-      <w:fldChar w:fldCharType="begin"/>
-    </w:r>
-    <w:r>
-      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
-      <w:instrText> PAGE </w:instrText>
-    </w:r>
-    <w:r>
-      <w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
-      <w:fldChar w:fldCharType="end"/>
-    </w:r>
+    <w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:t xml:space="preserve">${xmlEsc(state.authorName)}  ·  </w:t></w:r>
+    <w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:fldChar w:fldCharType="begin"/></w:r>
+    <w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:instrText> PAGE </w:instrText></w:r>
+    <w:r><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/><w:sz w:val="18"/><w:color w:val="9A8B73"/></w:rPr>
+      <w:fldChar w:fldCharType="end"/></w:r>
   </w:p>
 </w:ftr>`;
 
-  // ── Styles ────────────────────────────────────────────
   const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:docDefaults>
-    <w:rPrDefault><w:rPr>
-      <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
-      <w:sz w:val="24"/><w:szCs w:val="24"/>
-    </w:rPr></w:rPrDefault>
-  </w:docDefaults>
-  <w:style w:type="paragraph" w:styleId="Normal">
-    <w:name w:val="Normal"/>
-  </w:style>
+  <w:docDefaults><w:rPrDefault><w:rPr>
+    <w:rFonts w:ascii="Georgia" w:hAnsi="Georgia"/>
+    <w:sz w:val="24"/><w:szCs w:val="24"/>
+  </w:rPr></w:rPrDefault></w:docDefaults>
+  <w:style w:type="paragraph" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
   <w:style w:type="paragraph" w:styleId="Heading1">
     <w:name w:val="heading 1"/>
     <w:basedOn w:val="Normal"/>
     <w:pPr>
-      <w:spacing w:before="480" w:after="240"/>
+      <w:spacing w:before="560" w:after="280"/>
       <w:outlineLvl w:val="0"/>
-      <w:pBdr><w:bottom w:val="single" w:sz="4" w:space="8" w:color="C97B2A"/></w:pBdr>
+      <w:pBdr><w:bottom w:val="single" w:sz="4" w:space="10" w:color="C97B2A"/></w:pBdr>
     </w:pPr>
     <w:rPr>
       <w:b/><w:bCs/>
@@ -1217,27 +1486,20 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   </w:style>
 </w:styles>`;
 
-  // ── Relationships ─────────────────────────────────────
-  // relsXml built dynamically below with image relationships
-
   const rootRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>`;
 
-  // contentTypes built dynamically below with image overrides
-
-  // Build image relationships
-  let imgRelEntries = imgRels.map(r =>
+  const imgRelEntries = imgRels.map(r =>
     `<Relationship Id="rId${r.rId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/${r.name}"/>`
   ).join('\n  ');
 
-  // Build content type overrides for images
-  let imgContentTypes = imageFiles.map(f =>
+  const imgContentTypes = imageFiles.map(f =>
     `<Override PartName="/${f.name}" ContentType="image/jpeg"/>`
   ).join('\n  ');
 
-  const contentTypesXmlFinal = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml"  ContentType="application/xml"/>
@@ -1248,7 +1510,7 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   ${imgContentTypes}
 </Types>`;
 
-  const relsXmlFinal = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
   <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
@@ -1256,12 +1518,12 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
 </Relationships>`;
 
   const files = [
-    { name: '[Content_Types].xml',          data: enc.encode(contentTypesXmlFinal) },
+    { name: '[Content_Types].xml',          data: enc.encode(contentTypesXml) },
     { name: '_rels/.rels',                  data: enc.encode(rootRelsXml) },
     { name: 'word/document.xml',            data: enc.encode(documentXml) },
     { name: 'word/styles.xml',              data: enc.encode(stylesXml) },
     { name: 'word/footer1.xml',             data: enc.encode(footerXml) },
-    { name: 'word/_rels/document.xml.rels', data: enc.encode(relsXmlFinal) },
+    { name: 'word/_rels/document.xml.rels', data: enc.encode(relsXml) },
     ...imageFiles,
   ];
 
@@ -1273,11 +1535,10 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
 //  SCREENS
 // ═══════════════════════════════════════════════════════
 
-// ── Screen 0: Language selection ─────────────────────
 function renderLangScreen() {
   screen().innerHTML = `
     <div class="card">
-      <p style="font-family:'Lora',serif; font-size:1.1rem; margin-bottom:1.5rem; color:var(--ink-mid);">
+      <p style="font-family:'Lora',serif; font-size:1.05rem; margin-bottom:1.5rem; color:var(--ink-mid); font-style:italic;">
         Choose your language / Escolha seu idioma / Sprache wählen
       </p>
       <div class="lang-grid">
@@ -1290,31 +1551,45 @@ function renderLangScreen() {
       </div>
     </div>
   `;
-  // Check for backup in localStorage
+
   try {
     const backup = localStorage.getItem('bio_backup');
     if (backup) {
       const b = JSON.parse(backup);
+      const ui = LANGS[b.lang]?.ui;
       const saved = new Date(b.savedAt).toLocaleString();
       const banner = document.createElement('div');
       banner.className = 'notice info';
       banner.style.cssText = 'margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap;';
       banner.innerHTML = `
-        <span>💾 Backup encontrado: <strong>${b.authorName}</strong> — ${b.answers.length} respostas (${saved})</span>
-        <button id="restore-btn" class="btn btn-secondary" style="font-size:.82rem; padding:.4rem .9rem;">Restaurar</button>
+        <span>💾 ${ui ? ui.backupFound : 'Session found'}: <strong>${b.authorName}</strong> — ${b.answers.length} respostas (${saved})</span>
+        <button id="restore-btn" class="btn btn-secondary" style="font-size:.82rem; padding:.4rem .9rem;">${ui ? ui.backupRestore : 'Restore'}</button>
       `;
       screen().prepend(banner);
       document.getElementById('restore-btn').addEventListener('click', () => {
         state.lang       = b.lang;
         state.authorName = b.authorName;
         state.answers    = b.answers;
-        // restore position to generate screen
-        state.chapterIdx  = 7;
-        state.questionIdx = 1;
+        // Calculate real position from saved answers
+        const chaps = LANGS[b.lang].chapters;
+        let totalQ = 0;
+        for (let ci = 0; ci < chaps.length; ci++) {
+          for (let qi = 0; qi < chaps[ci].questions.length; qi++) {
+            if (totalQ >= b.answers.length) {
+              state.chapterIdx = ci; state.questionIdx = qi;
+              break;
+            }
+            totalQ++;
+          }
+          if (totalQ >= b.answers.length) break;
+        }
+        if (b.answers.length >= chaps.reduce((s,c)=>s+c.questions.length,0)) {
+          renderGenerateScreen(); return;
+        }
         document.getElementById('main-title').textContent    = LANGS[b.lang].ui.appTitle;
         document.getElementById('main-subtitle').textContent = LANGS[b.lang].ui.appSubtitle;
         document.documentElement.lang = b.lang;
-        renderGenerateScreen();
+        renderQuestionScreen();
       });
     }
   } catch(e) {}
@@ -1330,33 +1605,32 @@ function renderLangScreen() {
   });
 }
 
-// ── Screen 1: Provider + name ─────────────────────────
 function renderSetupScreen() {
   const ui = t();
   screen().innerHTML = `
     <div class="card">
-      <h2 style="font-family:'Lora',serif; margin-bottom:1.25rem; font-size:1.3rem;">${ui.step0Title}</h2>
-      <p style="color:var(--ink-mid); margin-bottom:1.75rem;">${ui.step0Intro}</p>
+      <h2 style="font-family:'Lora',serif; margin-bottom:.5rem; font-size:1.4rem;">${ui.step0Title}</h2>
+      <p style="color:var(--ink-mid); margin-bottom:2rem; font-size:.97rem;">${ui.step0Intro}</p>
 
       <div class="field">
-        <label for="provider-select">Provedor de IA / AI Provider</label>
+        <label>${ui.providerLabel}</label>
         <div style="position:relative;">
           <select id="provider-select">
-            <option value="groq" selected>🟢 Groq (Llama 3.3) — gratuito</option>
-            <option value="gemini">🟢 Google Gemini — gratuito</option>
-            <option value="claude">🔵 Claude / Anthropic — pago</option>
+            <option value="groq" selected>🟢 Groq (Llama 3.3) — ${ui.providerLabel === 'Provedor de IA' ? 'gratuito' : 'free'}</option>
+            <option value="gemini">🟢 Google Gemini — ${ui.providerLabel === 'Provedor de IA' ? 'gratuito' : 'free'}</option>
+            <option value="claude">🔵 Claude / Anthropic — ${ui.providerLabel === 'Provedor de IA' ? 'pago' : 'paid'}</option>
           </select>
           <span style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink-light);">▾</span>
         </div>
       </div>
 
       <div id="custom-key-field" style="display:none;" class="field">
-        <label for="api-key">API Key</label>
-        <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" />
+        <label>${ui.apiKeyLabel}</label>
+        <input type="password" id="api-key" placeholder="${ui.apiKeyPlaceholder}" autocomplete="off" />
       </div>
 
       <div class="field">
-        <label for="author-name">${ui.authorNameLabel}</label>
+        <label>${ui.authorNameLabel}</label>
         <input type="text" id="author-name" placeholder="${ui.authorNamePlaceholder}" />
       </div>
       <div class="btn-row">
@@ -1368,7 +1642,6 @@ function renderSetupScreen() {
   $('provider-select').addEventListener('change', () => {
     const p = $('provider-select').value;
     state.provider = p;
-    // Show key field only for Claude (not hardcoded)
     $('custom-key-field').style.display = p === 'claude' ? 'block' : 'none';
     if (p !== 'claude') state.apiKey = HARDCODED_KEYS[p];
   });
@@ -1376,9 +1649,9 @@ function renderSetupScreen() {
   $('start-btn').addEventListener('click', () => {
     const name = $('author-name').value.trim();
     if (!name) { showError(ui.errorName); return; }
-    state.provider   = $('provider-select').value;
+    state.provider  = $('provider-select').value;
     if (state.provider === 'claude') {
-      const key = ($('api-key') && $('api-key').value.trim());
+      const key = $('api-key')?.value.trim();
       if (!key) { showError(ui.errorApiKey); return; }
       state.apiKey = key;
     }
@@ -1390,32 +1663,29 @@ function renderSetupScreen() {
   });
 }
 
-// ── Screen 2: Question + optional follow-up ───────────
 function renderQuestionScreen() {
   const ui    = t();
   const chaps = chapters();
-
-  const chap = chaps[state.chapterIdx];
+  const chap  = chaps[state.chapterIdx];
   let question = chap.questions[state.questionIdx];
-  // Personalize first question of chapter 1 with author name
+
   if (state.chapterIdx === 0 && state.questionIdx === 0 && state.authorName) {
     const greetMap = {
-      pt: `${state.authorName}, onde você nasceu e em que ano? Como era o lugar onde cresceu?`,
-      en: `${state.authorName}, where were you born and in what year? What was the place like where you grew up?`,
-      de: `${state.authorName}, wo wurden Sie geboren und in welchem Jahr? Wie war der Ort, in dem Sie aufgewachsen sind?`,
-      es: `${state.authorName}, ¿dónde naciste y en qué año? ¿Cómo era el lugar donde creciste?`,
-      fr: `${state.authorName}, où êtes-vous né(e) et en quelle année\u00A0? Comment était l\u2019endroit où vous avez grandi\u00A0?`,
+      pt: `${state.authorName}, feche os olhos e pense na casa onde você cresceu. O que você vê, ouve ou sente quando está lá?`,
+      en: `${state.authorName}, close your eyes and think of the house where you grew up. What do you see, hear, or feel when you are there?`,
+      de: `${state.authorName}, schließen Sie die Augen und denken Sie an das Haus, in dem Sie aufgewachsen sind. Was sehen, hören oder fühlen Sie?`,
+      es: `${state.authorName}, cierra los ojos y piensa en la casa donde creciste. ¿Qué ves, escuchas o sientes cuando estás allí?`,
+      fr: `${state.authorName}, fermez les yeux et pensez à la maison où vous avez grandi. Que voyez-vous, entendez-vous ou ressentez-vous ?`,
     };
     question = greetMap[state.lang] || question;
   }
 
-  // reset transient state every time we land on a new question
-  state.followupQuestion  = null;
-  state.awaitingFollowup  = false;
-  state.pendingAnswer     = '';
-  state.pendingFollowup   = '';
+  state.followupQuestion = null;
+  state.awaitingFollowup = false;
+  state.pendingAnswer    = '';
 
   const canGoBack = state.chapterIdx > 0 || state.questionIdx > 0;
+  const chapNum   = state.chapterIdx + 1;
 
   screen().innerHTML = `
     <div id="progress-wrap">
@@ -1427,18 +1697,22 @@ function renderQuestionScreen() {
     </div>
 
     <div class="card" id="question-card">
+      <div class="chapter-eyebrow">
+        <span class="chapter-number">${ui.progressLabel} ${chapNum}</span>
+        <span class="chapter-number-line"></span>
+      </div>
       <div class="chapter-title">${chap.title}</div>
       <div class="question-text">${question}</div>
 
       <div id="ai-response-zone"></div>
 
-      <label class="followup-label" id="answer-label" style="margin-bottom:.5rem;">${ui.yourAnswerLabel}</label>
+      <span class="answer-label" id="answer-label">${ui.yourAnswerLabel}</span>
       <textarea id="answer-box" placeholder="..." rows="5"></textarea>
 
       <div class="photo-upload-area" id="photo-drop">
-        <label for="photo-input" style="cursor:pointer;">
-          📷 <strong>Adicionar fotos a este capítulo</strong> (opcional)<br>
-          <span style="font-size:.8rem;">Clique ou arraste imagens aqui — serão aplicadas em sépia no livro</span>
+        <label for="photo-input" style="cursor:pointer; text-transform:none; letter-spacing:0; font-size:.88rem; font-weight:400; color:var(--ink-light);">
+          ${ui.photoLabel}<br>
+          <span style="font-size:.78rem;">${ui.photoHint}</span>
         </label>
         <input type="file" id="photo-input" accept="image/*" multiple />
         <div class="photo-thumbs" id="photo-thumbs"></div>
@@ -1450,55 +1724,44 @@ function renderQuestionScreen() {
         ${canGoBack ? `<button class="btn btn-secondary" id="back-btn" style="margin-left:auto;">← Voltar</button>` : ''}
       </div>
       <div style="margin-top:.75rem; text-align:right;">
-        <button class="btn btn-secondary" id="save-now-btn" style="font-size:.78rem; padding:.35rem .85rem; color:var(--ink-light);">💾 Salvar respostas</button>
+        <button class="btn btn-secondary" id="save-now-btn" style="font-size:.78rem; padding:.35rem .85rem; color:var(--ink-light);">💾 ${ui.backupBtn.replace('⬇ ','')}</button>
       </div>
     </div>
   `;
 
-  setProgress(state.chapterIdx + 1, chaps.length);
+  setProgress(chapNum, chaps.length, chap.title);
 
   $('next-btn').addEventListener('click', () => handleNextClick(question, chap.title));
   $('skip-btn').addEventListener('click', () => advanceQuestion(question, chap.title, '', null, ''));
 
   if (canGoBack) {
     $('back-btn').addEventListener('click', () => {
-      // Remove last saved answer if it matches current position
-      // Go back one question
-      if (state.questionIdx > 0) {
-        state.questionIdx--;
-      } else {
-        state.chapterIdx--;
-        state.questionIdx = chaps[state.chapterIdx].questions.length - 1;
-      }
-      // Remove the last pushed answer so it can be redone
+      if (state.questionIdx > 0) { state.questionIdx--; }
+      else { state.chapterIdx--; state.questionIdx = chaps[state.chapterIdx].questions.length - 1; }
       if (state.answers.length > 0) state.answers.pop();
       renderQuestionScreen();
     });
   }
 
   $('save-now-btn').addEventListener('click', () => {
-    if (!state.answers.length) { showError('Nenhuma resposta ainda.'); return; }
+    if (!state.answers.length) { showError(ui.errorNoAnswers); return; }
     const data = JSON.stringify({ lang: state.lang, authorName: state.authorName, answers: state.answers, savedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
     a.href = url; a.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
     document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
   });
 
-  // ── Photo upload wiring ──────────────────────────────
   const chapIdx = state.chapterIdx;
   const thumbs  = $('photo-thumbs');
-
-  // Restore existing thumbs if user navigated back
   if (state.photos[chapIdx]) {
     for (const b64 of state.photos[chapIdx]) {
       const img = document.createElement('img');
       img.className = 'photo-thumb'; img.src = b64; thumbs.appendChild(img);
     }
   }
-
   $('photo-input').addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     for (const file of files) {
@@ -1510,8 +1773,6 @@ function renderQuestionScreen() {
     }
     e.target.value = '';
   });
-
-  // Drag-and-drop
   $('photo-drop').addEventListener('dragover', e => { e.preventDefault(); $('photo-drop').style.borderColor = 'var(--amber)'; });
   $('photo-drop').addEventListener('dragleave', () => { $('photo-drop').style.borderColor = ''; });
   $('photo-drop').addEventListener('drop', async (e) => {
@@ -1528,65 +1789,44 @@ function renderQuestionScreen() {
 }
 
 async function handleNextClick(question, chapterTitle) {
-  const ui = t();
+  const ui     = t();
   const answer = $('answer-box').value.trim();
 
-  // Phase 1: user answered main question → get follow-up
   if (!state.awaitingFollowup) {
     if (!answer) return;
     state.pendingAnswer    = answer;
     state.awaitingFollowup = true;
-
-    // disable + show spinner
-    const nextBtn = $('next-btn');
-    const skipBtn = $('skip-btn');
+    const nextBtn = $('next-btn'), skipBtn = $('skip-btn');
     nextBtn.disabled = skipBtn.disabled = true;
     nextBtn.innerHTML = `<span class="spinner"></span> ${ui.thinking}`;
-
     try {
       const fq = await getFollowupQuestion(chapterTitle, question, answer);
       state.followupQuestion = fq;
-
-      const zone = $('ai-response-zone');
-      zone.innerHTML = `
-        <div class="ai-response"><strong>✦</strong> ${fq}</div>
-        <label class="followup-label" style="margin-bottom:.5rem;">${ui.followupLabel}</label>
+      $('ai-response-zone').innerHTML = `
+        <div class="ai-followup-wrap">
+          <div class="ai-followup-label">${ui.aiAsksLabel}</div>
+          <div class="ai-followup-text">${fq}</div>
+        </div>
       `;
       $('answer-label').style.display = 'none';
       $('answer-box').value = '';
-      $('answer-box').placeholder = '...';
       nextBtn.innerHTML = ui.nextBtn;
-      nextBtn.disabled  = false;
-      skipBtn.disabled  = false;
+      nextBtn.disabled = skipBtn.disabled = false;
     } catch (e) {
-      // If follow-up fails, just advance
       advanceQuestion(question, chapterTitle, answer, null, '');
     }
-
-  // Phase 2: user answered follow-up → advance
   } else {
-    state.pendingFollowup = $('answer-box').value.trim();
-    advanceQuestion(question, chapterTitle, state.pendingAnswer, state.followupQuestion, state.pendingFollowup);
+    advanceQuestion(question, chapterTitle, state.pendingAnswer, state.followupQuestion, $('answer-box').value.trim());
   }
 }
 
 function advanceQuestion(question, chapterTitle, answer, followup, followupAnswer) {
   const chaps = chapters();
-  state.answers.push({
-    chapter:         chapterTitle,
-    chapterIdx:      state.chapterIdx,
-    question,
-    answer,
-    followup,
-    followupAnswer,
-  });
-  // Auto-save to localStorage after every answer
+  state.answers.push({ chapter: chapterTitle, chapterIdx: state.chapterIdx, question, answer, followup, followupAnswer });
   try {
     localStorage.setItem('bio_backup', JSON.stringify({
-      lang: state.lang,
-      authorName: state.authorName,
-      answers: state.answers,
-      savedAt: new Date().toISOString(),
+      lang: state.lang, authorName: state.authorName,
+      answers: state.answers, savedAt: new Date().toISOString(),
     }));
   } catch(e) {}
 
@@ -1603,12 +1843,9 @@ function advanceQuestion(question, chapterTitle, answer, followup, followupAnswe
   renderQuestionScreen();
 }
 
-// ── Screen 3: Generate ────────────────────────────────
 function renderGenerateScreen() {
   const ui    = t();
   const chaps = chapters();
-
-  // Group answers by chapter
   const byChapter = {};
   for (const a of state.answers) {
     if (!byChapter[a.chapterIdx]) byChapter[a.chapterIdx] = [];
@@ -1617,61 +1854,58 @@ function renderGenerateScreen() {
 
   const chapterItems = chaps.map((c, i) => {
     const done = byChapter[i] && byChapter[i].some(a => a.answer);
-    return `<li><span class="chap-num">${i+1}</span> <span>${c.title}</span> ${done ? `<span class="chap-done" style="margin-left:auto;">✓</span>` : ''}</li>`;
+    return `<li><span class="chap-num">${i+1}</span><span>${c.title}</span>${done ? `<span class="chap-done">✓</span>` : ''}</li>`;
   }).join('');
 
   screen().innerHTML = `
     <div class="card">
-      <div class="chapter-title">${ui.chaptersProgress}</div>
+      <p style="font-family:'Lora',serif; font-style:italic; color:var(--ink-mid); margin-bottom:1.25rem; font-size:1rem;">${ui.chaptersProgress}</p>
       <ul class="chapter-list">${chapterItems}</ul>
-      <div class="btn-row" style="margin-top:1.75rem;">
-        <button class="btn btn-secondary" id="backup-btn">⬇ Salvar respostas (JSON)</button>
+      <div class="btn-row" style="margin-top:1.5rem;">
+        <button class="btn btn-secondary" id="backup-btn">${ui.backupBtn}</button>
       </div>
     </div>
 
     <div class="card" id="cover-card">
-      <div class="chapter-title">Capa do livro</div>
-
-      <div id="cover-preview-wrap" style="text-align:center; margin-bottom:1rem;">
+      <p class="cover-section-title">${ui.coverTitle}</p>
+      <div id="cover-preview-wrap" style="text-align:center; margin-bottom:1.25rem;">
         <div id="cover-placeholder" style="
-          width:180px; height:248px; margin:0 auto;
+          width:160px; height:220px; margin:0 auto;
           background:var(--parchment); border-radius:var(--radius);
           display:flex; align-items:center; justify-content:center;
-          color:var(--ink-light); font-size:.85rem; border:1.5px dashed var(--amber-light);
-        ">Nenhuma capa ainda</div>
-        <img id="cover-preview" src="" alt="Capa" style="
-          display:none; width:180px; border-radius:var(--radius);
-          box-shadow:var(--shadow); filter:sepia(30%);
+          color:var(--ink-light); font-size:.82rem; border:1.5px dashed var(--amber-light);
+          font-family:'Lora',serif; font-style:italic;
+        ">${ui.coverNone}</div>
+        <img id="cover-preview" src="" alt="Cover" style="
+          display:none; width:160px; border-radius:var(--radius);
+          box-shadow:var(--shadow); filter:sepia(20%);
         "/>
       </div>
-
       <div class="btn-row" style="justify-content:center; flex-wrap:wrap;">
-        <button class="btn btn-primary" id="gen-cover-btn">🎨 Gerar capa com IA</button>
-        <button class="btn btn-secondary" id="regen-cover-btn" style="display:none;">🔄 Regenerar</button>
-        <label class="btn btn-secondary" for="cover-upload-input" style="cursor:pointer;">📁 Usar minha foto</label>
+        <button class="btn btn-primary" id="gen-cover-btn">${ui.coverGenerate}</button>
+        <button class="btn btn-secondary" id="regen-cover-btn" style="display:none;">${ui.coverRegenerate}</button>
+        <label class="btn btn-secondary" for="cover-upload-input" style="cursor:pointer;">${ui.coverUpload}</label>
         <input type="file" id="cover-upload-input" accept="image/*" style="display:none;"/>
       </div>
       <p id="cover-status" style="text-align:center; font-size:.82rem; color:var(--ink-light); margin-top:.75rem;"></p>
-
-      <div class="btn-row" style="margin-top:1.5rem;">
-        <button class="btn btn-primary" id="generate-btn">${ui.finishBtn}</button>
+      <div class="ornament-divider">✦ ✦ ✦</div>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="generate-btn" style="padding:.85rem 2.5rem; font-size:1rem;">${ui.finishBtn}</button>
       </div>
       <div id="gen-status"></div>
     </div>
   `;
 
-  // ── Backup ───────────────────────────────────────────
   $('backup-btn').addEventListener('click', () => {
     const data = JSON.stringify({ lang: state.lang, authorName: state.authorName, answers: state.answers, savedAt: new Date().toISOString() }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
-    const url2 = URL.createObjectURL(blob);
-    const a2 = document.createElement('a');
-    a2.href = url2; a2.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
-    document.body.appendChild(a2); a2.click();
-    setTimeout(() => { URL.revokeObjectURL(url2); a2.remove(); }, 1000);
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = `${state.authorName.replace(/\s+/g,'_')}_respostas.json`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
   });
 
-  // ── Cover preview helper ─────────────────────────────
   function showCoverPreview(b64) {
     state.coverImageB64 = b64;
     $('cover-placeholder').style.display = 'none';
@@ -1681,66 +1915,59 @@ function renderGenerateScreen() {
     $('cover-status').textContent = '';
   }
 
-  // ── Generate AI cover ─────────────────────────────────
   async function doGenCover() {
-    $('gen-cover-btn').disabled = true;
-    $('regen-cover-btn').disabled = true;
-    $('cover-status').innerHTML = '<span class="spinner" style="border-top-color:var(--amber);border-color:rgba(201,123,42,.2);vertical-align:middle;"></span> Gerando capa…';
-    const chap1Summary = (byChapter[0] || []).map(a => a.answer).filter(Boolean).join(' ').slice(0, 120);
+    $('gen-cover-btn').disabled = $('regen-cover-btn').disabled = true;
+    $('cover-status').innerHTML = `<span class="spinner" style="border-top-color:var(--amber);border-color:rgba(201,123,42,.2);vertical-align:middle;display:inline-block;"></span> ${ui.coverGenerating}`;
+    const chap1Summary = (byChapter[0] || []).map(a => a.answer).filter(Boolean).join(' ').slice(0, 150);
     const b64 = await fetchCoverImage(state.authorName, chap1Summary);
-    $('gen-cover-btn').disabled = false;
-    $('regen-cover-btn').disabled = false;
-    if (b64) {
-      showCoverPreview(b64);
-    } else {
-      $('cover-status').textContent = 'Não foi possível gerar a capa. Tente novamente ou use sua própria foto.';
-    }
+    $('gen-cover-btn').disabled = $('regen-cover-btn').disabled = false;
+    if (b64) { showCoverPreview(b64); }
+    else { $('cover-status').textContent = ui.coverError; }
   }
 
   $('gen-cover-btn').addEventListener('click', doGenCover);
   $('regen-cover-btn').addEventListener('click', doGenCover);
-
-  // ── Upload own cover photo ────────────────────────────
   $('cover-upload-input').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    $('cover-status').textContent = 'Processando…';
     const b64 = await fileToSepiaBase64(file, 800);
     showCoverPreview(b64);
     e.target.value = '';
   });
-
-  // Restore previously generated cover if navigating back
   if (state.coverImageB64) showCoverPreview(state.coverImageB64);
 
-  // ── Generate book ─────────────────────────────────────
   $('generate-btn').addEventListener('click', () => runGeneration(byChapter, chaps));
 }
 
 async function runGeneration(byChapter, chaps) {
-  const ui = t();
+  const ui     = t();
   const genBtn = $('generate-btn');
   const status = $('gen-status');
   genBtn.disabled = true;
-  genBtn.innerHTML = `<span class="spinner" style="border-top-color:var(--amber); border-color:rgba(201,123,42,.2);"></span> ${ui.generating}`;
+  genBtn.innerHTML = `<span class="spinner" style="border-top-color:var(--amber);border-color:rgba(201,123,42,.2);"></span> ${ui.generating}`;
+
+  // Emotional loading state
+  status.innerHTML = `
+    <div class="gen-loading">
+      <span class="gen-icon">${ui.genLoadingIcon}</span>
+      <div class="gen-chapter" id="gen-chapter-name">${chaps[0].title}…</div>
+      <div class="gen-phrase">${ui.genPhrase}</div>
+    </div>
+  `;
 
   const narratives = [];
   for (let i = 0; i < chaps.length; i++) {
     const qas = byChapter[i];
-    if (!qas || !qas.some(a => a.answer)) {
-      narratives.push(null);
-      continue;
-    }
-    status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">${chaps[i].title}…</p>`;
+    const chapNameEl = document.getElementById('gen-chapter-name');
+    if (chapNameEl) chapNameEl.textContent = `${chaps[i].title}…`;
+    if (!qas || !qas.some(a => a.answer)) { narratives.push(null); continue; }
     try {
-      const narrative = await generateNarrative(chaps[i].title, qas);
-      narratives.push(narrative);
+      narratives.push(await generateNarrative(chaps[i].title, qas));
     } catch (e) {
       narratives.push(qas.map(a => a.answer).filter(Boolean).join('\n\n'));
     }
   }
 
-  status.innerHTML = `<p style="color:var(--ink-light); font-size:.88rem; margin-top:1rem; text-align:center;">📄 DOCX…</p>`;
   try {
     const blob = await generateDocx(narratives, state.photos, state.coverImageB64);
     state.docxBlob = blob;
@@ -1752,52 +1979,37 @@ async function runGeneration(byChapter, chaps) {
   }
 }
 
-// ── Screen 4: Final ───────────────────────────────────
 function renderFinalScreen() {
   const ui = t();
   screen().innerHTML = `
     <div class="card final-hero">
-      <div class="big-icon">📖</div>
+      <span class="book-icon">📖</span>
       <h2>${ui.finalTitle}</h2>
+      <div class="final-name">${state.authorName}</div>
       <p>${ui.finalMessage}</p>
       <div class="btn-row" style="justify-content:center;">
-        <button class="btn btn-primary" id="dl-btn">${ui.downloadBtn}</button>
+        <button class="btn btn-primary" id="dl-btn" style="padding:.85rem 2.25rem;">${ui.downloadBtn}</button>
         <button class="btn btn-secondary" id="restart-btn">${ui.restartBtn}</button>
       </div>
     </div>
   `;
 
   $('dl-btn').addEventListener('click', () => {
-    const filename = `${state.authorName.replace(/\s+/g, '_')}_historia.docx`;
+    const filename = `${state.authorName.replace(/\s+/g,'_')}_memorias.docx`;
     const url = URL.createObjectURL(state.docxBlob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    const a   = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
   });
 
   $('restart-btn').addEventListener('click', () => {
-    state.lang = null; state.apiKey = ''; state.authorName = '';
-    state.chapterIdx = 0; state.questionIdx = 0;
-    state.answers = []; state.docxBlob = null;
+    Object.assign(state, { lang:null, apiKey:'', authorName:'', chapterIdx:0, questionIdx:0, answers:[], docxBlob:null, photos:{}, coverImageB64:null });
     renderLangScreen();
   });
 }
 
-// ═══════════════════════════════════════════════════════
-//  BOOT
-// ═══════════════════════════════════════════════════════
-// Inject the persistent progress bar into header area
-const progWrapGlobal = document.createElement('div');
-progWrapGlobal.id = 'progress-wrap';
-progWrapGlobal.innerHTML = `
-  <div id="progress-label">
-    <span id="progress-current"></span>
-    <span id="progress-pct"></span>
-  </div>
-  <div id="progress-bar"><div id="progress-fill"></div></div>
-`;
-// Will be rendered per-screen; boot
+// ── Boot ─────────────────────────────────────────────
 renderLangScreen();
 </script>
 </body>
