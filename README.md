@@ -98,13 +98,16 @@ Cada capítulo tem 2 perguntas base. Após cada resposta, a IA gera 1 pergunta d
 
 ### Providers de IA suportados
 
-| Provider | Modelo | Custo | Chave hardcodada |
-|----------|--------|-------|-----------------|
-| Groq | llama-3.3-70b-versatile | Gratuito (14.4k req/dia) | Sim |
-| Gemini | gemini-2.0-flash | Gratuito (1.5k req/dia) | Sim |
-| Claude | claude-sonnet-4-20250514 | Pago (~$0.10/sessão) | Não (usuário insere) |
+| Provider | Modelo | Custo | Onde obter a chave |
+|----------|--------|-------|--------------------|
+| Groq | llama-3.3-70b-versatile | Gratuito (14.4k req/dia) | https://console.groq.com/keys |
+| Gemini | gemini-2.0-flash | Gratuito (1.5k req/dia) | https://aistudio.google.com/apikey |
+| Claude | claude-sonnet-4-20250514 | Pago (~$0.10/sessão) | https://console.anthropic.com/settings/keys |
 
-O usuário seleciona o provider na tela de setup. Groq é o padrão.
+O usuário seleciona o provider e **insere a própria chave** na tela de setup
+(Groq é o padrão). Não há chaves embutidas no repositório — cada participante usa
+a sua, gerada gratuitamente pelo link correspondente. A chave é usada apenas no
+navegador e nunca é armazenada nem enviada a nenhum servidor além do provider.
 
 ### Chamadas à API por sessão
 
@@ -193,7 +196,7 @@ Para adicionar um idioma: incluir uma entrada no objeto `LANGS` em `index.html` 
 
 | Item | Status | Observação |
 |------|--------|------------|
-| Chaves de API no HTML público | ⚠️ Risco baixo | Groq e Gemini têm rate limit diário. Para produção, usar repositório privado ou proxy. |
+| Chaves de API no repositório | ✅ Resolvido | Nenhuma chave embutida. Cada usuário insere a própria na tela de setup; a chave fica só no navegador. |
 | Sem autenticação | ✅ Intencional | App público, sem dados sensíveis no servidor (zero backend). |
 | Sem armazenamento de respostas | ✅ Privacidade | Tudo fica no browser do usuário. Nada sai para servidor além das chamadas de API. |
 | CompressionStream | ✅ Compatível | Chrome 80+, Edge 80+, Safari 16.4+, Firefox 113+. |
@@ -236,8 +239,8 @@ Decisões já tomadas e implementadas:
 - Multi-idioma: PT, EN, DE, ES, FR (selecionado na tela inicial)
 - Output: DOCX gerado em JS puro (sem CDN), usando CompressionStream + XML Word manual
 - Providers de IA: Groq (padrão, gratuito), Gemini (gratuito), Claude (pago)
-  - Chaves de Groq e Gemini hardcodadas no HTML
-  - Claude requer input do usuário
+  - Sem chaves embutidas no repo; cada usuário insere a própria na tela de setup
+  - Placeholder e link "gerar chave grátis" dinâmicos por provider
 - Design: tipografia Lora + Source Sans 3, paleta âmbar/creme, caloroso/familiar
 - 8 capítulos biográficos, 2 perguntas cada
 - Após cada resposta: IA gera pergunta de aprofundamento personalizada
@@ -275,6 +278,7 @@ Próximo passo: [DESCREVA AQUI O QUE QUER FAZER A SEGUIR]
 | Zero backend | Node.js/Python API | GitHub Pages é gratuito e suficiente; sem manutenção |
 | DOCX puro JS | docx.js via CDN | CDN bloqueado no painel lateral Claude; independência de rede |
 | Groq como padrão | Claude API | Gratuito para testes; qualidade suficiente para o caso de uso |
+| Usuário insere a chave | Chave hardcoded / proxy | Repo público sem segredos; sem manutenção de proxy; cada um usa free tier próprio |
 | Pollinations.ai para capa | Gemini Imagen, DALL-E | Zero configuração, sem API key, gratuito |
 | localStorage para backup | IndexedDB | Simplicidade; dados são apenas texto |
 | Arquivo único | Multi-arquivo + build | GitHub Pages simples, zero toolchain |
