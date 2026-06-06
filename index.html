@@ -6,7 +6,7 @@
   <title>Agente Biográfico</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --cream:       #F7F2EA;
@@ -19,8 +19,12 @@
       --amber-pale:  #FBF0DE;
       --amber-deep:  #A0601A;
       --red-warn:    #B03A2E;
+      /* Ponte com a marca techcolab (acento secundário) */
+      --teal:        #02B793;
+      --teal-deep:   #007167;
+      --success:     #059669;
       --radius:      10px;
-      --shadow:      0 4px 28px rgba(43,36,22,.09);
+      --shadow:      0 2px 16px rgba(43,36,22,.06);
       --transition:  .25s ease;
     }
 
@@ -28,7 +32,7 @@
     html { font-size: 16px; scroll-behavior: smooth; }
 
     body {
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Inter', sans-serif;
       background-color: var(--cream);
       background-image:
         radial-gradient(ellipse at 20% 0%, rgba(201,123,42,.06) 0%, transparent 60%),
@@ -73,8 +77,13 @@
       font-size: clamp(1.7rem, 4.5vw, 2.4rem);
       font-weight: 600;
       letter-spacing: -.02em;
-      color: var(--ink);
       line-height: 1.2;
+      /* Título em gradiente — eco do design system techcolab (âmbar → teal) */
+      background: linear-gradient(100deg, var(--amber-deep) 0%, var(--amber) 45%, var(--teal) 135%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: var(--amber-deep);
     }
     header p.subtitle {
       color: var(--ink-light);
@@ -120,7 +129,8 @@
     }
     #progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--amber-deep), var(--amber-light));
+      /* Progresso âmbar → teal: caminho do calor pessoal rumo à conclusão (marca) */
+      background: linear-gradient(90deg, var(--amber-deep), var(--amber) 55%, var(--teal));
       border-radius: 99px;
       transition: width .6s cubic-bezier(.4,0,.2,1);
       width: 0%;
@@ -158,6 +168,7 @@
       line-height: 1.3;
     }
     .question-text {
+      position: relative;
       font-size: 1.15rem;
       font-weight: 400;
       color: var(--ink);
@@ -165,8 +176,19 @@
       margin-bottom: 1.5rem;
       font-family: 'Lora', serif;
       font-style: italic;
-      padding-left: 1rem;
+      padding-left: 1.5rem;
       border-left: 3px solid var(--amber-light);
+    }
+    .question-text::before {
+      content: '\201C';                 /* aspa de abertura decorativa */
+      position: absolute;
+      left: .45rem;
+      top: -.35rem;
+      font-family: 'Lora', serif;
+      font-size: 2.1rem;
+      line-height: 1;
+      color: var(--amber-light);
+      opacity: .55;
     }
 
     /* ── Textarea ───────────────────────────────────────── */
@@ -176,7 +198,7 @@
       border: 1.5px solid var(--parchment);
       border-radius: var(--radius);
       padding: .9rem 1.1rem;
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 1rem;
       color: var(--ink);
       background: var(--cream);
@@ -199,7 +221,7 @@
       gap: .5rem;
       padding: .75rem 1.75rem;
       border-radius: var(--radius);
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: .95rem;
       font-weight: 600;
       cursor: pointer;
@@ -236,7 +258,7 @@
       padding: .75rem 1.1rem;
       border: 1.5px solid var(--parchment);
       border-radius: var(--radius);
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 1rem;
       color: var(--ink);
       background: var(--cream);
@@ -277,7 +299,7 @@
       text-align: center;
       transition: all var(--transition);
       color: var(--ink-mid);
-      font-family: 'Source Sans 3', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
     .lang-btn:hover { border-color: var(--amber-light); background: var(--amber-pale); }
     .lang-btn.selected { border-color: var(--amber); background: var(--amber-pale); color: var(--amber); font-weight: 600; }
@@ -366,7 +388,7 @@
     }
     .chapter-list li:last-child { border: none; }
     .chap-num { font-family: 'Lora', serif; font-weight: 600; color: var(--amber); min-width: 1.4rem; }
-    .chap-done { color: #4a7c59; font-weight: 600; font-size: .78rem; margin-left: auto; }
+    .chap-done { color: var(--success); font-weight: 600; font-size: .78rem; margin-left: auto; }
 
     /* ── Photo upload ───────────────────────────────────── */
     .photo-upload-area {
@@ -493,7 +515,7 @@
       text-transform: uppercase;
       letter-spacing: .05em;
       color: #fff;
-      background: var(--amber);
+      background: var(--teal); /* acento da marca techcolab, contrasta com o card âmbar */
       padding: .2rem .55rem;
       border-radius: 99px;
     }
