@@ -896,98 +896,6 @@ const LANGS = {
         ]},
     ],
   },
-
-  fr: {
-    flag: '🇫🇷', label: 'Français',
-    ui: {
-      appTitle: 'Agent Biographique',
-      appSubtitle: 'Racontez votre histoire. Préservez-la pour toujours.',
-      step0Title: 'Bienvenue',
-      step0Intro: 'Cet agent vous guidera à travers des questions sur votre vie et générera un livre de mémoires au format Word (DOCX) à la fin.',
-      providerLabel: 'Fournisseur IA',
-      apiKeyLabel: 'Clé API',
-      apiKeyPlaceholder: 'sk-ant-...',
-      apiKeyHint: 'Votre clé est utilisée uniquement dans votre navigateur et jamais stockée.',
-      getKeyLabel: 'Pas de clé ? Obtenez-en une gratuitement ici',
-      authorNameLabel: 'Votre nom complet',
-      authorNamePlaceholder: 'Tel que vous voulez apparaître dans le livre',
-      startBtn: 'Commencer mon histoire →',
-      nextBtn: 'Continuer →',
-      skipBtn: 'Passer',
-      finishBtn: 'Générer mon livre',
-      downloadBtn: '⬇ Télécharger DOCX',
-      backupBtn: '⬇ Sauvegarder les réponses (JSON)',
-      restartBtn: 'Nouvelle histoire',
-      generating: 'Génération…',
-      thinking: 'Réflexion…',
-      aiAsksLabel: "L'IA DEMANDE",
-      yourAnswerLabel: 'VOTRE RÉPONSE',
-      chaptersProgress: 'Chapitres terminés',
-      finalTitle: 'Votre livre est prêt.',
-      finalMessage: "Chaque mot ici fait partie de qui vous êtes. Le fichier DOCX est prêt — modifiez-le, imprimez-le et offrez-le aux personnes que vous aimez.",
-      errorApiKey: 'Veuillez entrer votre clé API.',
-      errorName: 'Veuillez entrer votre nom.',
-      errorApi: 'Erreur API : ',
-      errorNoAnswers: 'Aucune réponse pour le moment.',
-      progressLabel: 'Chapitre',
-      of: 'sur',
-      backupFound: 'Session sauvegardée trouvée',
-      backupRestore: 'Restaurer',
-      coverTitle: 'Couverture du livre',
-      coverNone: 'Pas encore de couverture',
-      coverGenerate: '🎨 Générer une couverture avec IA',
-      coverRegenerate: '🔄 Régénérer',
-      coverUpload: '📁 Utiliser ma propre photo',
-      coverGenerating: 'Génération de la couverture…',
-      coverError: 'Impossible de générer la couverture. Réessayez ou utilisez votre propre photo.',
-      photoLabel: '📷 Ajouter des photos à ce chapitre (optionnel)',
-      photoHint: 'Cliquez ou déposez des images ici — elles apparaîtront en sépia dans le livre',
-      genLoadingIcon: '✍️',
-      genPhrase: 'Les souvenirs se transforment en mots…',
-    },
-    chapters: [
-      { title: "D'où je viens",
-        questions: [
-          "Fermez les yeux et pensez à la maison où vous avez grandi. Que voyez-vous, entendez-vous ou ressentez-vous quand vous y êtes ?",
-          "Qui était la personne qui vous a le plus défini(e) à cette époque — et qu'est-ce qu'elle vous a transmis sans avoir besoin de mots ?"
-        ]},
-      { title: "Enfance : ce qui est resté",
-        questions: [
-          "Quel est le souvenir d'enfance que vous n'avez jamais oublié — celui qui revient sans prévenir ?",
-          "Qu'aviez-vous dans l'enfance que les enfants d'aujourd'hui auront rarement ?"
-        ]},
-      { title: "Qui j'étais à 20 ans",
-        questions: [
-          "Comment étiez-vous à 18, 20 ans — que vouliez-vous, que craigniez-vous, qui pensiez-vous devenir ?",
-          "Quel a été le premier grand choix que vous avez fait seul(e) — et à quoi avez-vous renoncé pour lui ?"
-        ]},
-      { title: "Ce que j'ai construit",
-        questions: [
-          "Quand vous regardez tout ce pour quoi vous avez travaillé dans la vie, que voyez-vous qui va au-delà du salaire ou du titre ?",
-          "Y a-t-il eu un jour, un projet, un moment — où vous avez pensé « c'est pour ça que je suis là ». Qu'est-ce que c'était ?"
-        ]},
-      { title: "Qui j'ai aimé",
-        questions: [
-          "Il y a une personne — au-delà de vos parents — qui a changé de façon permanente qui vous êtes. Qui est-elle et qu'a-t-elle fait ?",
-          "L'amour vous a appris quelque chose que vous n'attendiez pas. Qu'est-ce que c'était ?"
-        ]},
-      { title: "Ce qui m'a brisé et fait",
-        questions: [
-          "Il y a eu un moment où tout semblait s'effondrer — une perte, une trahison, un échec. Qu'est-ce que c'était et comment l'avez-vous traversé ?",
-          "En regardant en arrière, de quelle erreur ou de quel échec êtes-vous secrètement reconnaissant(e) de l'avoir vécu ?"
-        ]},
-      { title: "Ce que je crois",
-        questions: [
-          "Quelle est la chose la plus importante que vous avez apprise sur la façon de traiter les gens ?",
-          "Si vous pouviez résumer en une phrase ce qui a vraiment guidé votre vie — non pas ce que vous avez prêché, mais ce que vous avez vraiment vécu — quelle serait-elle ?"
-        ]},
-      { title: "Ce que je laisse",
-        questions: [
-          "Que voulez-vous que les personnes qui vous aiment se rappellent de vous — non pas pour ce que vous avez fait, mais pour qui vous étiez ?",
-          "Y a-t-il quelque chose que vous n'avez jamais dit — à quelqu'un, ou à vous-même — que vous voulez laisser écrit ici ?"
-        ]},
-    ],
-  },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1056,16 +964,6 @@ const KEYGUIDE = {
     openGroq: 'Abrir Groq ↗', openGemini: 'Abrir Google AI Studio ↗',
     haveKeyBtn: 'Ya tengo mi clave →',
     safety: '🔒 Tu clave queda solo en tu navegador. Nunca se envía a nosotros ni se almacena.',
-  },
-  fr: {
-    title: 'D’abord, créez votre clé gratuite',
-    intro: 'Pour écrire votre livre, cette application utilise une intelligence artificielle. Vous avez besoin d’une « clé » gratuite — comme un mot de passe qui relie l’application à l’IA. Cela prend 2 minutes. Choisissez une option :',
-    recommended: 'Recommandé',
-    groqSteps: ['Cliquez sur « Ouvrir Groq » ci-dessous', 'Connectez-vous avec votre compte Google (ou créez un compte gratuit)', 'Cliquez sur « Create API Key », donnez-lui un nom et confirmez', 'Copiez la clé (commence par gsk_) et revenez ici'],
-    geminiSteps: ['Cliquez sur « Ouvrir Google AI Studio » ci-dessous', 'Connectez-vous avec votre compte Google', 'Cliquez sur « Create API key » et confirmez', 'Copiez la clé (commence par AIza) et revenez ici'],
-    openGroq: 'Ouvrir Groq ↗', openGemini: 'Ouvrir Google AI Studio ↗',
-    haveKeyBtn: 'J’ai ma clé →',
-    safety: '🔒 Votre clé reste uniquement dans votre navigateur. Elle n’est jamais envoyée ni stockée.',
   },
 };
 
