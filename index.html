@@ -495,6 +495,8 @@ const LANGS = {
       providerLabel: 'Provedor de IA',
       apiKeyLabel: 'Chave de API',
       apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'A chave é usada apenas no seu navegador e nunca é armazenada.',
+      getKeyLabel: 'Não tem uma chave? Gere gratuitamente aqui',
       authorNameLabel: 'Seu nome completo',
       authorNamePlaceholder: 'Como você quer ser identificado no livro',
       startBtn: 'Começar minha história →',
@@ -585,6 +587,8 @@ const LANGS = {
       providerLabel: 'AI Provider',
       apiKeyLabel: 'API Key',
       apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Your key is used only in your browser and never stored.',
+      getKeyLabel: 'No key yet? Get one for free here',
       authorNameLabel: 'Your full name',
       authorNamePlaceholder: 'As you want to appear in the book',
       startBtn: 'Begin my story →',
@@ -675,6 +679,8 @@ const LANGS = {
       providerLabel: 'KI-Anbieter',
       apiKeyLabel: 'API-Schlüssel',
       apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Ihr Schlüssel wird nur in Ihrem Browser verwendet und nie gespeichert.',
+      getKeyLabel: 'Noch keinen Schlüssel? Hier kostenlos erhalten',
       authorNameLabel: 'Ihr vollständiger Name',
       authorNamePlaceholder: 'Wie Sie im Buch erscheinen möchten',
       startBtn: 'Meine Geschichte beginnen →',
@@ -765,6 +771,8 @@ const LANGS = {
       providerLabel: 'Proveedor de IA',
       apiKeyLabel: 'Clave de API',
       apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Tu clave se usa solo en tu navegador y nunca se almacena.',
+      getKeyLabel: '¿No tienes una clave? Consíguela gratis aquí',
       authorNameLabel: 'Tu nombre completo',
       authorNamePlaceholder: 'Como quieres aparecer en el libro',
       startBtn: 'Comenzar mi historia →',
@@ -855,6 +863,8 @@ const LANGS = {
       providerLabel: 'Fournisseur IA',
       apiKeyLabel: 'Clé API',
       apiKeyPlaceholder: 'sk-ant-...',
+      apiKeyHint: 'Votre clé est utilisée uniquement dans votre navigateur et jamais stockée.',
+      getKeyLabel: 'Pas de clé ? Obtenez-en une gratuitement ici',
       authorNameLabel: 'Votre nom complet',
       authorNamePlaceholder: 'Tel que vous voulez apparaître dans le livre',
       startBtn: 'Commencer mon histoire →',
@@ -939,16 +949,10 @@ const LANGS = {
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
-const HARDCODED_KEYS = {
-  groq:   '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',
-  gemini: 'AIzaSyDhBtD56KjHS6VesK1sXVJIlgm6pWY_ztY',
-  claude: '',
-};
-
 const state = {
   lang: null,
   provider: 'groq',
-  apiKey: HARDCODED_KEYS.groq,
+  apiKey: '',
   authorName: '',
   chapterIdx: 0,
   questionIdx: 0,
@@ -962,9 +966,9 @@ const state = {
 };
 
 const PROVIDERS = {
-  gemini: { label: 'Google Gemini', placeholder: 'AIza...', model: 'gemini-2.0-flash', free: true },
-  groq:   { label: 'Groq (Llama 3.3)', placeholder: 'gsk_...', model: 'llama-3.3-70b-versatile', free: true },
-  claude: { label: 'Claude / Anthropic', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514', free: false },
+  groq:   { label: 'Groq (Llama 3.3)', placeholder: 'gsk_...', model: 'llama-3.3-70b-versatile', free: true, keyUrl: 'https://console.groq.com/keys' },
+  gemini: { label: 'Google Gemini', placeholder: 'AIza...', model: 'gemini-2.0-flash', free: true, keyUrl: 'https://aistudio.google.com/apikey' },
+  claude: { label: 'Claude / Anthropic', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514', free: false, keyUrl: 'https://console.anthropic.com/settings/keys' },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1624,9 +1628,14 @@ function renderSetupScreen() {
         </div>
       </div>
 
-      <div id="custom-key-field" style="display:none;" class="field">
+      <div id="key-field" class="field">
         <label>${ui.apiKeyLabel}</label>
-        <input type="password" id="api-key" placeholder="${ui.apiKeyPlaceholder}" autocomplete="off" />
+        <input type="password" id="api-key" placeholder="${PROVIDERS[state.provider].placeholder}" autocomplete="off" />
+        <p style="font-size:.8rem; color:var(--ink-light); margin-top:.4rem; line-height:1.5;">
+          ${ui.apiKeyHint}<br>
+          <a id="get-key-link" href="${PROVIDERS[state.provider].keyUrl}" target="_blank" rel="noopener"
+             style="color:var(--amber); text-decoration:none; font-weight:600;">🔑 ${ui.getKeyLabel} ↗</a>
+        </p>
       </div>
 
       <div class="field">
@@ -1642,19 +1651,17 @@ function renderSetupScreen() {
   $('provider-select').addEventListener('change', () => {
     const p = $('provider-select').value;
     state.provider = p;
-    $('custom-key-field').style.display = p === 'claude' ? 'block' : 'none';
-    if (p !== 'claude') state.apiKey = HARDCODED_KEYS[p];
+    $('api-key').placeholder = PROVIDERS[p].placeholder;
+    $('get-key-link').href   = PROVIDERS[p].keyUrl;
   });
 
   $('start-btn').addEventListener('click', () => {
     const name = $('author-name').value.trim();
     if (!name) { showError(ui.errorName); return; }
-    state.provider  = $('provider-select').value;
-    if (state.provider === 'claude') {
-      const key = $('api-key')?.value.trim();
-      if (!key) { showError(ui.errorApiKey); return; }
-      state.apiKey = key;
-    }
+    state.provider = $('provider-select').value;
+    const key = $('api-key')?.value.trim();
+    if (!key) { showError(ui.errorApiKey); return; }
+    state.apiKey = key;
     state.authorName  = name;
     state.chapterIdx  = 0;
     state.questionIdx = 0;
@@ -1943,6 +1950,47 @@ async function runGeneration(byChapter, chaps) {
   const ui     = t();
   const genBtn = $('generate-btn');
   const status = $('gen-status');
+
+  // Safety net: a restored session has no API key in memory. Ask for it inline.
+  if (!state.apiKey) {
+    status.innerHTML = `
+      <div class="card" style="margin-top:1rem; box-shadow:none; border-color:var(--amber-light);">
+        <div class="field">
+          <label>${ui.providerLabel}</label>
+          <select id="gen-provider-select">
+            <option value="groq" selected>🟢 Groq (Llama 3.3)</option>
+            <option value="gemini">🟢 Google Gemini</option>
+            <option value="claude">🔵 Claude / Anthropic</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>${ui.apiKeyLabel}</label>
+          <input type="password" id="gen-api-key" placeholder="${PROVIDERS[state.provider].placeholder}" autocomplete="off" />
+          <p style="font-size:.8rem; color:var(--ink-light); margin-top:.4rem;">
+            <a id="gen-get-key-link" href="${PROVIDERS[state.provider].keyUrl}" target="_blank" rel="noopener"
+               style="color:var(--amber); text-decoration:none; font-weight:600;">🔑 ${ui.getKeyLabel} ↗</a>
+          </p>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="gen-key-confirm">${ui.finishBtn}</button>
+        </div>
+      </div>`;
+    $('gen-provider-select').addEventListener('change', () => {
+      const p = $('gen-provider-select').value;
+      $('gen-api-key').placeholder = PROVIDERS[p].placeholder;
+      $('gen-get-key-link').href   = PROVIDERS[p].keyUrl;
+    });
+    $('gen-key-confirm').addEventListener('click', () => {
+      const k = $('gen-api-key').value.trim();
+      if (!k) { showError(ui.errorApiKey); return; }
+      state.provider = $('gen-provider-select').value;
+      state.apiKey   = k;
+      status.innerHTML = '';
+      runGeneration(byChapter, chaps);
+    });
+    return;
+  }
+
   genBtn.disabled = true;
   genBtn.innerHTML = `<span class="spinner" style="border-top-color:var(--amber);border-color:rgba(201,123,42,.2);"></span> ${ui.generating}`;
 
@@ -2014,3 +2062,4 @@ renderLangScreen();
 </script>
 </body>
 </html>
+
