@@ -463,6 +463,50 @@
       opacity: .6;
     }
 
+    /* ── Key guide (onboarding) ─────────────────────────── */
+    .key-option {
+      border: 1.5px solid var(--parchment);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.1rem;
+      background: var(--cream);
+    }
+    .key-option.recommended {
+      border-color: var(--amber);
+      background: var(--amber-pale);
+    }
+    .key-option-head {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: .65rem;
+    }
+    .key-option-name {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .key-badge {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #fff;
+      background: var(--amber);
+      padding: .2rem .55rem;
+      border-radius: 99px;
+    }
+    .key-steps {
+      margin: 0 0 1rem 1.1rem;
+      padding: 0;
+      color: var(--ink-mid);
+      font-size: .92rem;
+      line-height: 1.6;
+    }
+    .key-steps li { margin-bottom: .35rem; }
+    .key-option .btn { width: 100%; justify-content: center; text-decoration: none; }
+
     @media (max-width: 520px) {
       .card { padding: 1.5rem; }
       .btn-row { flex-direction: column; }
@@ -969,6 +1013,60 @@ const PROVIDERS = {
   groq:   { label: 'Groq (Llama 3.3)', placeholder: 'gsk_...', model: 'llama-3.3-70b-versatile', free: true, keyUrl: 'https://console.groq.com/keys' },
   gemini: { label: 'Google Gemini', placeholder: 'AIza...', model: 'gemini-2.0-flash', free: true, keyUrl: 'https://aistudio.google.com/apikey' },
   claude: { label: 'Claude / Anthropic', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514', free: false, keyUrl: 'https://console.anthropic.com/settings/keys' },
+};
+
+// Onboarding: como criar a chave gratuita (Groq / Gemini), por idioma
+const KEYGUIDE = {
+  pt: {
+    title: 'Primeiro, crie sua chave gratuita',
+    intro: 'Para escrever seu livro, este app usa uma inteligência artificial. Você precisa de uma "chave" gratuita — pense nela como uma senha que conecta o app à IA. Leva 2 minutos. Escolha uma das opções:',
+    recommended: 'Recomendado',
+    groqSteps: ['Clique em "Abrir Groq" abaixo', 'Entre com sua conta Google (ou crie uma conta gratuita)', 'Clique em "Create API Key", dê um nome qualquer e confirme', 'Copie a chave (começa com gsk_) e volte aqui'],
+    geminiSteps: ['Clique em "Abrir Google AI Studio" abaixo', 'Entre com sua conta Google', 'Clique em "Create API key" e confirme', 'Copie a chave (começa com AIza) e volte aqui'],
+    openGroq: 'Abrir Groq ↗', openGemini: 'Abrir Google AI Studio ↗',
+    haveKeyBtn: 'Já tenho minha chave →',
+    safety: '🔒 Sua chave fica só no seu navegador. Nunca é enviada para nós nem armazenada.',
+  },
+  en: {
+    title: 'First, create your free key',
+    intro: 'To write your book, this app uses an artificial intelligence. You need a free "key" — think of it as a password that connects the app to the AI. It takes 2 minutes. Pick one option:',
+    recommended: 'Recommended',
+    groqSteps: ['Click "Open Groq" below', 'Sign in with your Google account (or create a free account)', 'Click "Create API Key", give it any name and confirm', 'Copy the key (starts with gsk_) and come back here'],
+    geminiSteps: ['Click "Open Google AI Studio" below', 'Sign in with your Google account', 'Click "Create API key" and confirm', 'Copy the key (starts with AIza) and come back here'],
+    openGroq: 'Open Groq ↗', openGemini: 'Open Google AI Studio ↗',
+    haveKeyBtn: 'I have my key →',
+    safety: '🔒 Your key stays only in your browser. It is never sent to us or stored.',
+  },
+  de: {
+    title: 'Erstellen Sie zuerst Ihren kostenlosen Schlüssel',
+    intro: 'Um Ihr Buch zu schreiben, nutzt diese App eine künstliche Intelligenz. Sie benötigen einen kostenlosen „Schlüssel" — wie ein Passwort, das die App mit der KI verbindet. Es dauert 2 Minuten. Wählen Sie eine Option:',
+    recommended: 'Empfohlen',
+    groqSteps: ['Klicken Sie unten auf „Groq öffnen"', 'Melden Sie sich mit Ihrem Google-Konto an (oder erstellen Sie ein kostenloses Konto)', 'Klicken Sie auf „Create API Key", geben Sie einen Namen ein und bestätigen Sie', 'Kopieren Sie den Schlüssel (beginnt mit gsk_) und kommen Sie zurück'],
+    geminiSteps: ['Klicken Sie unten auf „Google AI Studio öffnen"', 'Melden Sie sich mit Ihrem Google-Konto an', 'Klicken Sie auf „Create API key" und bestätigen Sie', 'Kopieren Sie den Schlüssel (beginnt mit AIza) und kommen Sie zurück'],
+    openGroq: 'Groq öffnen ↗', openGemini: 'Google AI Studio öffnen ↗',
+    haveKeyBtn: 'Ich habe meinen Schlüssel →',
+    safety: '🔒 Ihr Schlüssel bleibt nur in Ihrem Browser. Er wird nie an uns gesendet oder gespeichert.',
+  },
+  es: {
+    title: 'Primero, crea tu clave gratuita',
+    intro: 'Para escribir tu libro, esta app usa una inteligencia artificial. Necesitas una "clave" gratuita — piénsala como una contraseña que conecta la app con la IA. Toma 2 minutos. Elige una opción:',
+    recommended: 'Recomendado',
+    groqSteps: ['Haz clic en "Abrir Groq" abajo', 'Inicia sesión con tu cuenta de Google (o crea una cuenta gratuita)', 'Haz clic en "Create API Key", ponle cualquier nombre y confirma', 'Copia la clave (empieza con gsk_) y vuelve aquí'],
+    geminiSteps: ['Haz clic en "Abrir Google AI Studio" abajo', 'Inicia sesión con tu cuenta de Google', 'Haz clic en "Create API key" y confirma', 'Copia la clave (empieza con AIza) y vuelve aquí'],
+    openGroq: 'Abrir Groq ↗', openGemini: 'Abrir Google AI Studio ↗',
+    haveKeyBtn: 'Ya tengo mi clave →',
+    safety: '🔒 Tu clave queda solo en tu navegador. Nunca se envía a nosotros ni se almacena.',
+  },
+  fr: {
+    title: 'D’abord, créez votre clé gratuite',
+    intro: 'Pour écrire votre livre, cette application utilise une intelligence artificielle. Vous avez besoin d’une « clé » gratuite — comme un mot de passe qui relie l’application à l’IA. Cela prend 2 minutes. Choisissez une option :',
+    recommended: 'Recommandé',
+    groqSteps: ['Cliquez sur « Ouvrir Groq » ci-dessous', 'Connectez-vous avec votre compte Google (ou créez un compte gratuit)', 'Cliquez sur « Create API Key », donnez-lui un nom et confirmez', 'Copiez la clé (commence par gsk_) et revenez ici'],
+    geminiSteps: ['Cliquez sur « Ouvrir Google AI Studio » ci-dessous', 'Connectez-vous avec votre compte Google', 'Cliquez sur « Create API key » et confirmez', 'Copiez la clé (commence par AIza) et revenez ici'],
+    openGroq: 'Ouvrir Groq ↗', openGemini: 'Ouvrir Google AI Studio ↗',
+    haveKeyBtn: 'J’ai ma clé →',
+    safety: '🔒 Votre clé reste uniquement dans votre navigateur. Elle n’est jamais envoyée ni stockée.',
+  },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1604,9 +1702,45 @@ function renderLangScreen() {
       document.getElementById('main-title').textContent    = LANGS[state.lang].ui.appTitle;
       document.getElementById('main-subtitle').textContent = LANGS[state.lang].ui.appSubtitle;
       document.documentElement.lang = state.lang;
-      renderSetupScreen();
+      renderKeyGuideScreen();
     });
   });
+}
+
+// ── Tela 0.5: como criar a chave gratuita (primeiro passo) ──
+function renderKeyGuideScreen() {
+  const g = KEYGUIDE[state.lang] || KEYGUIDE.en;
+  const stepList = steps => steps.map(s => `<li>${s}</li>`).join('');
+  screen().innerHTML = `
+    <div class="card">
+      <h2 style="font-family:'Lora',serif; margin-bottom:.5rem; font-size:1.4rem;">${g.title}</h2>
+      <p style="color:var(--ink-mid); margin-bottom:1.75rem; font-size:.97rem;">${g.intro}</p>
+
+      <div class="key-option recommended">
+        <div class="key-option-head">
+          <span class="key-option-name">🟢 Groq</span>
+          <span class="key-badge">${g.recommended}</span>
+        </div>
+        <ol class="key-steps">${stepList(g.groqSteps)}</ol>
+        <a class="btn btn-primary" href="${PROVIDERS.groq.keyUrl}" target="_blank" rel="noopener">${g.openGroq}</a>
+      </div>
+
+      <div class="key-option">
+        <div class="key-option-head">
+          <span class="key-option-name">🟢 Google Gemini</span>
+        </div>
+        <ol class="key-steps">${stepList(g.geminiSteps)}</ol>
+        <a class="btn btn-secondary" href="${PROVIDERS.gemini.keyUrl}" target="_blank" rel="noopener">${g.openGemini}</a>
+      </div>
+
+      <p style="font-size:.82rem; color:var(--ink-light); margin:1.25rem 0 1.5rem; text-align:center; line-height:1.6;">${g.safety}</p>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn btn-primary" id="have-key-btn" style="padding:.85rem 2.5rem;">${g.haveKeyBtn}</button>
+      </div>
+    </div>
+  `;
+  $('have-key-btn').addEventListener('click', renderSetupScreen);
 }
 
 function renderSetupScreen() {
