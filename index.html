@@ -1085,9 +1085,6 @@ Maximal 2 Sätze. Keine Einleitung. Antworten Sie NUR mit der Frage.`,
     es: `Eres un entrevistador empático en una entrevista biográfica en español.
 Haz UNA pregunta de seguimiento específica sobre un detalle concreto o emoción que mencionó la persona.
 Máximo 2 oraciones. Sin introducciones. Responde SOLO con la pregunta.`,
-    fr: `Vous êtes un intervieweur empathique pour un entretien biographique en français.
-Posez UNE question de suivi spécifique sur un détail concret ou une émotion mentionnée.
-Maximum 2 phrases. Sans introduction. Répondez UNIQUEMENT avec la question.`,
   };
   const sys = systemMap[lang] || systemMap.en;
   const user = `Capítulo: ${chapterTitle}\nPergunta: ${originalQuestion}\nResposta: ${answer}`;
@@ -1107,7 +1104,9 @@ Regras obrigatórias:
 - Cada parágrafo deve ter 4 a 6 frases. Cerca de 500 palavras no total.
 - NÃO inclua o título do capítulo
 - NÃO use frases prontas ("a vida é uma jornada", "no fim das contas", "aprendi que")
-- Se a resposta for curta, aprofunde o sentimento implícito — não invente fatos`,
+- Cada parágrafo deve trazer algo NOVO — não repita o mesmo fato, objeto ou ideia em parágrafos diferentes
+- Se a resposta for curta, aprofunde o sentimento implícito — não invente fatos
+- Antes de entregar, releia e remova repetições e clichês, e garanta o limite de 4 a 6 frases por parágrafo`,
 
     en: `You are a memoir writer — sensitive, literary, without sentimental excess. Write exactly 4 paragraphs for this chapter of a pocket memoir.
 
@@ -1119,7 +1118,9 @@ Mandatory rules:
 - Each paragraph should have 4 to 6 sentences. About 500 words total.
 - Do NOT include the chapter title
 - Do NOT use clichés ("life is a journey", "in the end", "I learned that")
-- If an answer is short, deepen the implicit feeling — do not invent facts`,
+- Each paragraph must add something NEW — do not repeat the same fact, object or idea across paragraphs
+- If an answer is short, deepen the implicit feeling — do not invent facts
+- Before delivering, reread and remove repetition and clichés, and ensure the 4–6 sentences per paragraph limit`,
 
     de: `Sie sind ein Memoirenschreiber — einfühlsam, literarisch, ohne sentimentale Übertreibung. Schreiben Sie genau 4 Absätze für dieses Kapitel eines Taschenbuchs der Erinnerungen.
 
@@ -1131,7 +1132,9 @@ Pflichtregeln:
 - Jeder Absatz sollte 4 bis 6 Sätze haben. Insgesamt ca. 500 Wörter.
 - Fügen Sie KEINEN Kapiteltitel ein
 - Verwenden Sie KEINE Klischees
-- Bei kurzen Antworten vertiefen Sie das implizite Gefühl — erfinden Sie keine Fakten`,
+- Jeder Absatz muss etwas NEUES bringen — wiederholen Sie nicht dieselbe Tatsache, dasselbe Objekt oder dieselbe Idee in verschiedenen Absätzen
+- Bei kurzen Antworten vertiefen Sie das implizite Gefühl — erfinden Sie keine Fakten
+- Überprüfen Sie den Text vor der Ausgabe, entfernen Sie Wiederholungen und Klischees und halten Sie das Limit von 4 bis 6 Sätzen pro Absatz ein`,
 
     es: `Eres un escritor de memorias — sensible, literario, sin exceso sentimental. Escribe exactamente 4 párrafos para este capítulo de un libro de memorias de bolsillo.
 
@@ -1143,19 +1146,10 @@ Reglas obligatorias:
 - Cada párrafo debe tener 4 a 6 oraciones. Unas 500 palabras en total.
 - NO incluyas el título del capítulo
 - NO uses frases hechas
-- Si una respuesta es corta, profundiza el sentimiento implícito — no inventes hechos`,
+- Cada párrafo debe aportar algo NUEVO — no repitas el mismo hecho, objeto o idea en distintos párrafos
+- Si una respuesta es corta, profundiza el sentimiento implícito — no inventes hechos
+- Antes de entregar, relee y elimina repeticiones y frases hechas, y respeta el límite de 4 a 6 oraciones por párrafo`,
 
-    fr: `Vous êtes un écrivain de mémoires — sensible, littéraire, sans excès sentimental. Écrivez exactement 4 paragraphes pour ce chapitre d'un livre de mémoires de poche.
-
-Règles obligatoires:
-- Écrivez à la première personne, comme la voix de la personne elle-même
-- Le premier paragraphe doit s'ouvrir sur une image concrète ou un moment spécifique — jamais une généralisation
-- Utilisez des noms propres, des lieux et des détails exacts des réponses
-- Ton: chaleureux, honnête, sans mélodrame — comme une conversation intime devenue prose
-- Chaque paragraphe doit avoir 4 à 6 phrases. Environ 500 mots au total.
-- N'incluez PAS le titre du chapitre
-- N'utilisez PAS de clichés
-- Si une réponse est courte, approfondissez le sentiment implicite — n'inventez pas de faits`,
   };
 
   const sys = systemMap[lang] || systemMap.en;
@@ -1383,7 +1377,7 @@ async function generateDocx(narratives, chapterImages = {}, coverB64 = null) {
   const titleMap = { pt:'Minhas Memórias', en:'My Memories', de:'Meine Erinnerungen', es:'Mis Memorias', fr:'Mes Mémoires' };
   const byMap    = { pt:'por', en:'by', de:'von', es:'por', fr:'par' };
   const dateStr  = new Date().toLocaleDateString(
-    state.lang==='pt'?'pt-BR':state.lang==='de'?'de-DE':state.lang==='es'?'es-ES':state.lang==='fr'?'fr-FR':'en-US',
+    state.lang==='pt'?'pt-BR':state.lang==='de'?'de-DE':state.lang==='es'?'es-ES':'en-US',
     { year:'numeric', month:'long' }
   );
   const bookTitle = titleMap[state.lang] || titleMap.en;
@@ -1736,7 +1730,6 @@ function renderQuestionScreen() {
       en: `${state.authorName}, close your eyes and think of the house where you grew up. What do you see, hear, or feel when you are there?`,
       de: `${state.authorName}, schließen Sie die Augen und denken Sie an das Haus, in dem Sie aufgewachsen sind. Was sehen, hören oder fühlen Sie?`,
       es: `${state.authorName}, cierra los ojos y piensa en la casa donde creciste. ¿Qué ves, escuchas o sientes cuando estás allí?`,
-      fr: `${state.authorName}, fermez les yeux et pensez à la maison où vous avez grandi. Que voyez-vous, entendez-vous ou ressentez-vous ?`,
     };
     question = greetMap[state.lang] || question;
   }
