@@ -943,6 +943,7 @@ const state = {
 const PROVIDERS = {
   groq:   { label: 'Groq (Llama 3.3)', placeholder: 'gsk_...', model: 'llama-3.3-70b-versatile', free: true, keyUrl: 'https://console.groq.com/keys' },
   gemini: { label: 'Google Gemini', placeholder: 'AIza...', model: 'gemini-2.0-flash', free: true, keyUrl: 'https://aistudio.google.com/apikey' },
+  openai: { label: 'OpenAI (GPT-4o mini)', placeholder: 'sk-...', model: 'gpt-4o-mini', free: false, keyUrl: 'https://platform.openai.com/api-keys' },
   claude: { label: 'Claude / Anthropic', placeholder: 'sk-ant-...', model: 'claude-sonnet-4-20250514', free: false, keyUrl: 'https://console.anthropic.com/settings/keys' },
 };
 
@@ -1042,6 +1043,21 @@ async function callAI(systemPrompt, userMessage, maxTokens = 600) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
       body: JSON.stringify({
         model: PROVIDERS.groq.model,
+        max_tokens: maxTokens,
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
+      }),
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e?.error?.message || res.statusText); }
+    const data = await res.json();
+    return data.choices[0].message.content.trim();
+  }
+
+  if (p === 'openai') {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({
+        model: PROVIDERS.openai.model,
         max_tokens: maxTokens,
         messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
       }),
@@ -1671,6 +1687,7 @@ function renderSetupScreen() {
           <select id="provider-select">
             <option value="groq" selected>🟢 Groq (Llama 3.3) — ${ui.providerLabel === 'Provedor de IA' ? 'gratuito' : 'free'}</option>
             <option value="gemini">🟢 Google Gemini — ${ui.providerLabel === 'Provedor de IA' ? 'gratuito' : 'free'}</option>
+            <option value="openai">🔵 OpenAI (GPT-4o mini) — ${ui.providerLabel === 'Provedor de IA' ? 'pago' : 'paid'}</option>
             <option value="claude">🔵 Claude / Anthropic — ${ui.providerLabel === 'Provedor de IA' ? 'pago' : 'paid'}</option>
           </select>
           <span style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--ink-light);">▾</span>
@@ -2008,6 +2025,7 @@ async function runGeneration(byChapter, chaps) {
           <select id="gen-provider-select">
             <option value="groq" selected>🟢 Groq (Llama 3.3)</option>
             <option value="gemini">🟢 Google Gemini</option>
+            <option value="openai">🔵 OpenAI (GPT-4o mini)</option>
             <option value="claude">🔵 Claude / Anthropic</option>
           </select>
         </div>
